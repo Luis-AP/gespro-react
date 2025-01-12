@@ -1,9 +1,8 @@
+import { RouterProvider } from "react-router-dom";
+import Router from "./routes/Router";
+
 function App() {
-    return (
-        <>
-            <h1>Welcome to GesPro React!</h1>
-        </>
-    );
+    return <RouterProvider router={Router} />;
 }
 
 export default App;
