@@ -10,11 +10,24 @@ const Router = createBrowserRouter([
                 index: true,
                 element: <h1>Welcome to GesPro React!</h1>,
             },
+            {
+                path: "activities",
+                element: <div>Lista de Actividades</div>,
+            },
+            {
+                path: "projects",
+                element: <div>Lista de Proyectos</div>,
+            },
         ],
     },
     {
-        path: "*",
-        element: <>404 - Not Found</>,
+        element: <Layout />,
+        children: [
+            {
+                path: "*",
+                element: <h1>404 Not Found</h1>,
+            },
+        ],
     },
 ]);
 
