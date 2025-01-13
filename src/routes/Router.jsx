@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
+import ProtectedRoute from "./ProtectedRoute";
 // Importar las páginas
 
 const Router = createBrowserRouter([
@@ -12,7 +13,11 @@ const Router = createBrowserRouter([
             },
             {
                 path: "activities",
-                element: <div>Lista de Actividades</div>,
+                element: (
+                    <ProtectedRoute>
+                        <div>Lista de Actividades</div>
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: "projects",
