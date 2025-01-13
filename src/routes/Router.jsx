@@ -1,8 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
+import Login from "../pages/Login/Login";
 // Importar las páginas
 
 const Router = createBrowserRouter([
+    {
+        path: "/login",
+        element: <Login />,
+    },
     {
         element: <Layout />,
         children: [
