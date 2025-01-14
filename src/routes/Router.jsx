@@ -1,39 +1,45 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { AuthProvider } from "../contexts/AuthContext";
 import Layout from "./Layout";
 import Login from "../pages/Login/Login";
 import ProfessorDashboard from "../pages/ProfessorDashboard/ProfessorDashboard";
+import { ProtectedRoute, ProfessorRoute, StudentRoute } from "@/routes/ProtectedRoute";
 
-const Router = createBrowserRouter([
-    {
-        path: "/login",
-        element: <Login />,
-    },
-    {
-        element: <Layout />,
-        children: [
-            {
-                index: true,
-                element: <h1>Welcome to GesPro React!</h1>,
-            },
-            {
-                path: "activities",
-                element: <ProfessorDashboard />,
-            },
-            {
-                path: "projects",
-                element: <div>Lista de Proyectos</div>,
-            },
-        ],
-    },
-    {
-        element: <Layout />,
-        children: [
-            {
-                path: "*",
-                element: <h1>404 Not Found</h1>,
-            },
-        ],
-    },
-]);
+const router = createBrowserRouter(
+    createRoutesFromElements(
+        <Route element={<AuthProvider />}>
+            <Route path="/login" element={<Login />} />
+            
+            <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                <Route index element={<Navigate to="/activities" replace />} />
+                <Route
+                    path="activities"
+                    element={
+                        <ProfessorRoute>
+                            <ProfessorDashboard />
+                        </ProfessorRoute>
+                    }
+                />
+                <Route
+                    path="projects"
+                    element={
+                        <StudentRoute>
+                            <div>Lista de Proyectos</div>
+                        </StudentRoute>
+                    }
+                />
+            </Route>
 
-export default Router;
+            <Route path="*" element={<Layout />}>
+                <Route path="*" element={<h1>404 Not Found</h1>} />
+            </Route>
+        </Route>
+    )
+);
+
+function AppRouter() {
+    return <RouterProvider router={router} />;
+}
+
+export default AppRouter;

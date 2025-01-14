@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import UserProfile from "./UserProfile";
+import { UserMenu } from "./UserMenu";
+import { GraduationCap } from "lucide-react";
 
 export default function Header({ items }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -40,11 +41,8 @@ export default function Header({ items }) {
                     {/* Logo */}
                     <div className="flex shrink-0 items-center">
                         <Link to="/" className="flex items-center space-x-2">
-                            <img
-                                alt="GesPro Logo"
-                                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                                className="h-8 w-auto"
-                            />
+                            <GraduationCap className="h-8 w-8" />
+                            <span className="font-bold text-xl hidden sm:inline">GesPro</span>
                         </Link>
                     </div>
 
@@ -65,19 +63,22 @@ export default function Header({ items }) {
                     </nav>
                 </div>
 
-                {/* UserProfile */}
-                <UserProfile />
+                {/* UserMenu */}
+                <div className="flex items-center">
+                    <UserMenu />
+                </div>
             </div>
 
             {/* Mobile menu */}
             {isOpen && (
                 <nav className="lg:hidden">
-                    <ul className="flex flex-col space-y-4 p-4 text-black text-left">
+                    <ul className="flex flex-col space-y-4 p-4 text-white text-left">
                         {items.map((item) => (
                             <li key={item.path}>
                                 <Link
                                     to={item.path}
                                     className="hover:underline"
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     {item.label}
                                 </Link>

@@ -2,12 +2,36 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GraduationCap } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import HeroSection from "@/components/HeroSection";
 import LoginForm from "@/components/LoginForm";
 import RegisterForm from "@/components/RegisterForm";
+import authService from "@/services/authService";
 
 function Login() {
   const [currentTab, setCurrentTab] = useState("login");
+  const [isLoading, setIsLoading] = useState(false);
+  const { actions } = useAuth();
+
+  const handleLogin = async (credentials) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.login(credentials);
+      actions.login(response.token);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async (studentData) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.register(studentData);
+      actions.login(response.token);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black to-neutral-900 flex">
@@ -30,7 +54,8 @@ function Login() {
             <Tabs
               defaultValue="login"
               className="w-full"
-              onValueChange={(value) => setCurrentTab(value)}
+              value={currentTab}
+              onValueChange={setCurrentTab}
             >
               <TabsList className="grid w-full grid-cols-2 bg-neutral-900">
                 <TabsTrigger value="login">Iniciar sesión</TabsTrigger>
@@ -38,11 +63,17 @@ function Login() {
               </TabsList>
 
               <TabsContent value="login">
-                <LoginForm />
+                <LoginForm 
+                  onSubmit={handleLogin}
+                  isLoading={isLoading}
+                />
               </TabsContent>
 
               <TabsContent value="register">
-                <RegisterForm />
+                <RegisterForm 
+                  onSubmit={handleRegister}
+                  isLoading={isLoading}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
