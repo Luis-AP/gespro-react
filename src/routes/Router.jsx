@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
 import Login from "../pages/Login/Login";
-// Importar las páginas
+import ProfessorDashboard from "../pages/ProfessorDashboard/ProfessorDashboard";
 
 const Router = createBrowserRouter([
     {
@@ -17,7 +17,7 @@ const Router = createBrowserRouter([
             },
             {
                 path: "activities",
-                element: <div>Lista de Actividades</div>,
+                element: <ProfessorDashboard />,
             },
             {
                 path: "projects",
