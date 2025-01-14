@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
 import ProfessorDashboard from "../pages/ProfessorDashboard/ProfessorDashboard";
+import CreateActivity from "../pages/CreateActivity/CreateActivity";
 
 const Router = createBrowserRouter([
     {
@@ -12,7 +13,16 @@ const Router = createBrowserRouter([
             },
             {
                 path: "activities",
-                element: <ProfessorDashboard />,
+                children: [
+                    {
+                        index: true,
+                        element: <ProfessorDashboard />,
+                    },
+                    {
+                        path: "create",
+                        element: <CreateActivity />,
+                    },
+                ],
             },
             {
                 path: "projects",
