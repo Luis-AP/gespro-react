@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import HeroSection from "@/components/HeroSection";
@@ -11,10 +12,12 @@ import authService from "@/services/authService";
 function Login() {
   const [currentTab, setCurrentTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { actions } = useAuth();
 
   const handleLogin = async (credentials) => {
     setIsLoading(true);
+    setError(null);
     try {
         const response = await authService.login(credentials);
         await actions.login({
@@ -22,8 +25,7 @@ function Login() {
             user: response.user
         });
     } catch (error) {
-        // Aquí puedes manejar el error si lo necesitas
-        console.error('Login error:', error);
+      setError(error.data?.message || error.message || 'Ha ocurrido un error al iniciar sesión');
     } finally {
         setIsLoading(false);
     }
@@ -74,6 +76,11 @@ function Login() {
               </TabsList>
 
               <TabsContent value="login">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
                 <LoginForm 
                   onSubmit={handleLogin}
                   isLoading={isLoading}

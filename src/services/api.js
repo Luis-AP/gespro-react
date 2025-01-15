@@ -9,18 +9,34 @@ class ApiError extends Error {
 }
 
 async function handleResponse(response) {
+  if (!response) {
+    throw new ApiError(
+      'No se pudo conectar con el servidor. Por favor, intente más tarde.',
+      0,
+      { type: 'connection_error' }
+    );
+  }
+
   const contentType = response.headers.get('content-type');
   let data;
   
-  if (contentType && contentType.includes('application/json')) {
-    data = await response.json();
-  } else {
-    data = await response.text();
+  try {
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+  } catch (error) {
+    throw new ApiError(
+      'Error al procesar la respuesta del servidor',
+      response.status,
+      { type: 'parse_error' }
+    );
   }
   
   if (!response.ok) {
     throw new ApiError(
-      data.message || 'Ha ocurrido un error',
+      data.mensaje || data.message || 'Ha ocurrido un error',
       response.status,
       data
     );
@@ -38,7 +54,7 @@ export async function get(endpoint, token = null) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'GET',
     headers,
-  });
+  }).catch(() => null);
 
   return handleResponse(response);
 }
@@ -57,7 +73,7 @@ export async function post(endpoint, data = null, token = null) {
     method: 'POST',
     headers,
     body: data instanceof FormData ? data : JSON.stringify(data),
-  });
+  }).catch(() => null);
 
   return handleResponse(response);
 }

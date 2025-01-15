@@ -1,39 +1,4 @@
-import { simulateResponse, simulateError } from './api';
 import { get, post } from './api';
-
-const mockUsers = [
-  {
-    id: 2,
-    email: 'profesor@ejemplo.com',
-    password: 'password123',
-    role: 'professor',
-    name: 'Carlos',
-    lastName: 'Pérez'
-  },
-  {
-    email: 'estudiante@ejemplo.com',
-    password: 'password123',
-    role: 'student',
-    name: 'María',
-    lastName: 'García',
-    enrollmentNumber: '12345',
-    career: 'Ingeniería',
-    enrollmentDate: '2024-01-15'
-  }
-];
-
-// Función auxiliar para generar tokens JWT simulados
-function generateMockToken(user) {
-  // Cuando esté lista la parte de Flask lo cambio a: return post('/auth/token', { email: user.email });
-  const payload = {
-    id: user.id,
-    sub: user.email,
-    role: user.role,
-    name: `${user.name} ${user.lastName}`,
-  };
-  
-  return btoa(JSON.stringify(payload));
-}
 
 class AuthService {
   async login(credentials) {
@@ -48,22 +13,16 @@ class AuthService {
             throw new Error('Respuesta inválida del servidor');
         }
 
-        // Obtener la información completa del usuario validando el token
         const userData = await this.validateToken(response.token);
-        console.log('User data:', userData);
         
         return {
             token: response.token,
             user: userData
         };
     } catch (error) {
-        console.error('Login error:', error);
-        if (error.status === 404) {
-            throw new Error('Email o contraseña incorrectos');
-        }
-        throw new Error('Error al iniciar sesión');
+        throw error;
     }
-  }
+}
 
   async register(studentData) {
     try {
@@ -84,7 +43,6 @@ class AuthService {
         throw new Error('Error al registrar estudiante');
       }
 
-      // Login automático después del registro exitoso
       return this.login({
         email: studentData.email,
         password: studentData.password
@@ -108,12 +66,10 @@ class AuthService {
     if (!token) return null;
 
     try {
-        // Usar la utilidad get() que ya maneja headers y errores
         const userData = await get('/auth/validate', token);
         return userData;
     } catch (error) {
         console.error('Token validation error:', error);
-        // Mantener el formato de error específico para el token
         if (error.status === 401) {
             throw new Error('Token inválido o expirado');
         }

@@ -88,7 +88,6 @@ function AuthProvider() {
     }, [initializeAuth]);
 
     const login = useCallback(async ({ token, user }) => {
-        console.log('Login:', user);
         if (!token || !user) {
             throw new Error("Token o datos de usuario inválidos");
         }
