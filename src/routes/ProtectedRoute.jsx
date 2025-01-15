@@ -26,15 +26,18 @@ export function RoleRoute({ children, roles }) {
     }
 
     // Si el usuario no tiene el rol requerido, redirigir según su rol
-    const redirectPath = user?.role === 'professor' ? '/activities' : '/projects';
+    const redirectPath =
+        user?.role === "professor"
+            ? "/activities/professor"
+            : "/projects/student";
     return <Navigate to={redirectPath} replace />;
 }
 
 // Componentes específicos para cada rol
 export function ProfessorRoute({ children }) {
-    return <RoleRoute roles={['professor']}>{children}</RoleRoute>;
+    return <RoleRoute roles={["professor"]}>{children}</RoleRoute>;
 }
 
 export function StudentRoute({ children }) {
-    return <RoleRoute roles={['student']}>{children}</RoleRoute>;
+    return <RoleRoute roles={["student"]}>{children}</RoleRoute>;
 }
