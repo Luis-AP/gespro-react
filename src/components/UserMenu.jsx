@@ -21,23 +21,29 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-blue-700">
+        <Button 
+          variant="ghost" 
+          className="relative h-10 w-10 rounded-full"
+          aria-label="Menú de usuario"
+        >
           <User className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white" align="end">
-        <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel className="text-sm font-medium">Mi Cuenta</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled className="flex flex-col items-start">
-          <span className="font-medium">{user?.name}</span>
-          <span className="text-xs text-gray-500">
-            {user?.role === 'professor' ? 'Profesor' : 'Estudiante'}
-          </span>
-        </DropdownMenuItem>
+        <div className="px-2 py-1.5">
+          <div className="flex flex-col">
+            <span className="font-medium text-sm">{user?.name}</span>
+            <span className="text-xs text-muted-foreground">
+              {user?.role === 'professor' ? 'Profesor' : 'Estudiante'}
+            </span>
+          </div>
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           onClick={handleLogout}
-          className="text-red-600 cursor-pointer hover:bg-gray-100"
+          className="text-destructive focus:text-destructive cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Cerrar Sesión</span>

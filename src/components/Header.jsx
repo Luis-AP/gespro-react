@@ -1,92 +1,57 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
 import { GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Header({ items }) {
-    const [isOpen, setIsOpen] = useState(false);
-
     return (
-        <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
-            <div className="container mx-auto flex justify-between items-center">
-                {/* Container for logo, menu and desktop nav */}
-                <div className="flex justify-between w-full lg:w-auto gap-6">
-                    {/* Mobile menu button */}
-                    <div className="lg:hidden">
-                        <button
-                            className="text-gray-200 hover:text-gray-400 focus:outline-none"
-                            onClick={() => setIsOpen(!isOpen)}
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d={
-                                        isOpen
-                                            ? "M6 18L18 6M6 6l12 12"
-                                            : "M4 6h16M4 12h16M4 18h16"
-                                    }
-                                />
-                            </svg>
-                        </button>
-                    </div>
-
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="px-8 flex h-16 items-center justify-between max-w-[1400px] mx-auto">
+                {/* Logo y Navegación */}
+                <div className="flex items-center gap-8">
                     {/* Logo */}
-                    <div className="flex shrink-0 items-center">
-                        <Link to="/" className="flex items-center space-x-2">
-                            <GraduationCap className="h-8 w-8" />
-                            <span className="font-bold text-xl hidden sm:inline">GesPro</span>
-                        </Link>
-                    </div>
+                    <Link to="/" className="flex items-center gap-3">
+                        <GraduationCap className="h-6 w-6" />
+                        <span className="font-bold text-xl hidden sm:inline">GesPro</span>
+                    </Link>
 
-                    {/* Desktop menu */}
-                    <nav className="hidden lg:flex space-x-6">
-                        <ul className="flex space-x-4">
-                            {items.map((item) => (
-                                <li key={item.path}>
-                                    <Link
-                                        to={item.path}
-                                        className="hover:underline"
-                                    >
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
+                    {/* Navegación Desktop */}
+                    <nav className="hidden md:flex items-center gap-2">
+                        {items.map((item) => (
+                            <Button
+                                key={item.path}
+                                variant="ghost"
+                                className="text-sm"
+                                asChild
+                            >
+                                <Link to={item.path}>{item.label}</Link>
+                            </Button>
+                        ))}
                     </nav>
                 </div>
 
-                {/* UserMenu */}
-                <div className="flex items-center">
+                {/* Navegación Móvil */}
+                <nav className="md:hidden flex items-center">
+                    <div className="flex flex-wrap justify-end gap-3">
+                        {items.map((item) => (
+                            <Button
+                                key={item.path}
+                                variant="ghost"
+                                size="sm"
+                                className="text-sm h-8"
+                                asChild
+                            >
+                                <Link to={item.path}>{item.label}</Link>
+                            </Button>
+                        ))}
+                    </div>
+                </nav>
+
+                {/* User Menu */}
+                <div className="flex items-center pl-4">
                     <UserMenu />
                 </div>
             </div>
-
-            {/* Mobile menu */}
-            {isOpen && (
-                <nav className="lg:hidden">
-                    <ul className="flex flex-col space-y-4 p-4 text-white text-left">
-                        {items.map((item) => (
-                            <li key={item.path}>
-                                <Link
-                                    to={item.path}
-                                    className="hover:underline"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    {item.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            )}
         </header>
     );
 }
