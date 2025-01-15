@@ -57,14 +57,19 @@ function AuthProvider() {
     const location = useLocation();
 
     const validateAndSetUser = useCallback(async (token) => {
-        const userData = authService.validateToken(token);
-        if (!userData) {
+        if (!token) return false;
+    
+        try {
+            const userData = await authService.validateToken(token);
+            if (!userData) return false;
+    
+            dispatch({ type: ACTIONS.LOGIN, payload: token });
+            dispatch({ type: ACTIONS.SET_USER, payload: userData });
+            return true;
+        } catch (error) {
+            console.error('Error validating token:', error);
             return false;
         }
-
-        dispatch({ type: ACTIONS.LOGIN, payload: token });
-        dispatch({ type: ACTIONS.SET_USER, payload: userData });
-        return true;
     }, []);
 
     const initializeAuth = useCallback(async () => {
@@ -82,11 +87,14 @@ function AuthProvider() {
         initializeAuth();
     }, [initializeAuth]);
 
-    const login = useCallback(async (token) => {
-        const isValid = await validateAndSetUser(token);
-        if (!isValid) {
-            throw new Error("Token inválido");
+    const login = useCallback(async ({ token, user }) => {
+        console.log('Login:', user);
+        if (!token || !user) {
+            throw new Error("Token o datos de usuario inválidos");
         }
+
+        dispatch({ type: ACTIONS.LOGIN, payload: token });
+        dispatch({ type: ACTIONS.SET_USER, payload: user });
 
         Cookies.set("token", token, {
             secure: true,
@@ -94,10 +102,10 @@ function AuthProvider() {
             expires: 7,
         });
 
-        const redirectPath = state.user?.role === 'professor' ? '/activities' : '/projects';
+        const redirectPath = user.role === 'professor' ? '/activities' : '/projects';
         const origin = location.state?.from?.pathname || redirectPath;
         navigate(origin);
-    }, [validateAndSetUser, location.state, navigate, state.user?.role]);
+    }, [location.state, navigate]);
 
     const logout = useCallback(() => {
         Cookies.remove("token");

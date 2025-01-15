@@ -16,20 +16,31 @@ function Login() {
   const handleLogin = async (credentials) => {
     setIsLoading(true);
     try {
-      const response = await authService.login(credentials);
-      actions.login(response.token);
+        const response = await authService.login(credentials);
+        await actions.login({
+            token: response.token,
+            user: response.user
+        });
+    } catch (error) {
+        // Aquí puedes manejar el error si lo necesitas
+        console.error('Login error:', error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
   const handleRegister = async (studentData) => {
     setIsLoading(true);
     try {
-      const response = await authService.register(studentData);
-      actions.login(response.token);
+        const response = await authService.register(studentData);
+        await actions.login({
+            token: response.token,
+            user: response.user
+        });
+    } catch (error) {
+        console.error('Register error:', error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 

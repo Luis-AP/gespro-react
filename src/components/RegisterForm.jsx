@@ -28,9 +28,14 @@ function RegisterForm({ onSubmit, isLoading }) {
   const onSubmitForm = async (data) => {
     try {
       setError(null);
-      await onSubmit(data);
+      const formattedData = {
+        ...data,
+        enrollmentDate: data.enrollmentDate ? format(data.enrollmentDate, 'yyyy-MM-dd') : null
+      };
+      await onSubmit(formattedData);
     } catch (err) {
-      setError(err.message || 'Ha ocurrido un error al registrarse');
+      const errorMessage = err.data?.message || err.message || 'Ha ocurrido un error al registrarse';
+      setError(errorMessage);
     }
   };
 

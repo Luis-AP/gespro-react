@@ -18,7 +18,8 @@ function LoginForm({ onSubmit, isLoading }) {
       setError(null);
       await onSubmit(data);
     } catch (err) {
-      setError(err.message || 'Ha ocurrido un error al iniciar sesión');
+      const errorMessage = err.data?.message || err.message || 'Ha ocurrido un error al iniciar sesión';
+      setError(errorMessage);
     }
   };
 

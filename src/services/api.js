@@ -8,12 +8,15 @@ class ApiError extends Error {
   }
 }
 
-const defaultHeaders = {
-  'Content-Type': 'application/json',
-};
-
 async function handleResponse(response) {
-  const data = await response.json();
+  const contentType = response.headers.get('content-type');
+  let data;
+  
+  if (contentType && contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    data = await response.text();
+  }
   
   if (!response.ok) {
     throw new ApiError(
@@ -27,7 +30,7 @@ async function handleResponse(response) {
 }
 
 export async function get(endpoint, token = null) {
-  const headers = { ...defaultHeaders };
+  const headers = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -41,30 +44,38 @@ export async function get(endpoint, token = null) {
 }
 
 export async function post(endpoint, data = null, token = null) {
-  const headers = { ...defaultHeaders };
+  const headers = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (!(data instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'POST',
     headers,
-    body: data ? JSON.stringify(data) : null,
+    body: data instanceof FormData ? data : JSON.stringify(data),
   });
 
   return handleResponse(response);
 }
 
 export async function patch(endpoint, data = null, token = null) {
-  const headers = { ...defaultHeaders };
+  const headers = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (!(data instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'PATCH',
     headers,
-    body: data ? JSON.stringify(data) : null,
+    body: data instanceof FormData ? data : JSON.stringify(data),
   });
 
   return handleResponse(response);
