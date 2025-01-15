@@ -1,37 +1,101 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { professorColumns as columns } from "@/components/activities/columns";
 import { DataTable } from "@/components/activities/data-table";
 import { ActivityDetails } from "@/components/activities/activity-details";
 import ActivityForm from "@/components/activities/ActivityForm";
 import { Button } from "@/components/ui/button";
-import activitiesData from "./activity-data";
+import activitiesService from "@/services/activitiesService";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { Toaster } from "@/components/ui/toaster";
 
 const ProfessorDashboard = () => {
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [formOpen, setFormOpen] = useState(false);
+    const [activities, setActivities] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+    const { state } = useAuth();
+    const user = state.user;
 
-    const handleViewDetails = (activity) => {
-        setSelectedActivity(activity);
-        setDetailsOpen(true);
+    useEffect(() => {
+      fetchActivities();
+  }, [user]);
+
+    const fetchActivities = async () => {
+        try {
+            setIsLoading(true);
+            const response = await activitiesService.getActivities({ 
+                professorId: user.id 
+            });
+            toast({
+                title: "Éxito",
+                description: "Actividades cargadas correctamente",
+            });
+            setActivities(response.activities);
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "No se pudieron cargar las actividades",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleViewDetails = async (activity) => {
+        try {
+            const response = await activitiesService.getActivityById(activity.id);
+            setSelectedActivity(response.activity);
+            setDetailsOpen(true);
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "No se pudo cargar el detalle de la actividad",
+                variant: "destructive",
+            });
+        }
     };
 
     const handleCreateActivity = () => {
-        /* Siempre y cuando no se haya seleccionado una actividad previamente */
         setSelectedActivity(null);
         setFormOpen(true);
     };
 
-    const handleSubmitNewActivity = (newActivity) => {
-        console.log("Nueva actividad creada:", newActivity);
-        setFormOpen(false);
-        // setActivities([...activities, newActivity]);
+    const handleSubmitNewActivity = async (activityData) => {
+        try {
+            setIsLoading(true);
+            const newActivityData = {
+                ...activityData,
+                professorId: user.id
+            };
+            
+            await activitiesService.createActivity(newActivityData);
+            
+            toast({
+                title: "Éxito",
+                description: "Actividad creada correctamente",
+            });
+            
+            setFormOpen(false);
+            fetchActivities();
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: error.message || "No se pudo crear la actividad",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const dataWithViewDetails = activitiesData.activities.map((activity) => ({
+    const dataWithViewDetails = activities.map((activity) => ({
         ...activity,
-        onViewDetails: handleViewDetails,
+        onViewDetails: () => handleViewDetails(activity),
     }));
 
     return (
@@ -44,7 +108,11 @@ const ProfessorDashboard = () => {
                     </Button>
                 </div>
             </div>
-            <DataTable columns={columns} data={dataWithViewDetails} />
+            <DataTable 
+                columns={columns} 
+                data={dataWithViewDetails} 
+                isLoading={isLoading}
+            />
             <ActivityDetails
                 activity={selectedActivity}
                 open={detailsOpen}
@@ -53,9 +121,10 @@ const ProfessorDashboard = () => {
             <ActivityForm
                 open={formOpen}
                 onOpenChange={setFormOpen}
-                isLoading={false}
+                isLoading={isLoading}
                 onSubmit={handleSubmitNewActivity}
             />
+            <Toaster />
         </div>
     );
 };

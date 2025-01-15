@@ -2,10 +2,11 @@ import { simulateResponse, simulateError } from './api';
 
 const mockUsers = [
   {
+    id: 2,
     email: 'profesor@ejemplo.com',
     password: 'password123',
     role: 'professor',
-    name: 'Juan',
+    name: 'Carlos',
     lastName: 'Pérez'
   },
   {
@@ -24,6 +25,7 @@ const mockUsers = [
 function generateMockToken(user) {
   // Cuando esté lista la parte de Flask lo cambio a: return post('/auth/token', { email: user.email });
   const payload = {
+    id: user.id,
     sub: user.email,
     role: user.role,
     name: `${user.name} ${user.lastName}`,
@@ -48,6 +50,7 @@ class AuthService {
       return simulateResponse({
         token,
         user: {
+          id: user.id,
           email: user.email,
           role: user.role,
           name: `${user.name} ${user.lastName}`
