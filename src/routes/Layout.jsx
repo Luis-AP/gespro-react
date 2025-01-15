@@ -9,8 +9,8 @@ export default function Layout() {
     const isProfessor = state?.user?.role === 'professor';
 
     const menuItems = isProfessor 
-        ? [{ label: "Actividades", path: "/activities" }]
-        : [{ label: "Proyectos", path: "/projects" }];
+        ? [{ label: "Actividades", path: "/activities/professor" }, { label: "Proyectos", path: "/projects/professor" }]
+        : [{ label: "Actividades", path: "/activities/student" }, { label: "Proyectos", path: "/projects/student" }];
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">

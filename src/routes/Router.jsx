@@ -1,5 +1,4 @@
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 import { AuthProvider } from "../contexts/AuthContext";
 import Layout from "./Layout";
 import Login from "../pages/Login/Login";
@@ -12,23 +11,38 @@ const router = createBrowserRouter(
             <Route path="/login" element={<Login />} />
             
             <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-                <Route index element={<Navigate to="/activities" replace />} />
                 <Route
                     path="activities"
-                    element={
+                >
+                    <Route path="student" element={
+                        <StudentRoute>
+                            <div>Actividades del Estudiante</div>
+                        </StudentRoute>
+                    }
+                    />
+                    <Route path="professor" element={
                         <ProfessorRoute>
                             <ProfessorDashboard />
                         </ProfessorRoute>
                     }
-                />
+                    />
+                </Route>
                 <Route
                     path="projects"
-                    element={
+                >
+                    <Route path="student" element={
                         <StudentRoute>
-                            <div>Lista de Proyectos</div>
+                            <div>Proyectos del Estudiante</div>
                         </StudentRoute>
                     }
-                />
+                    />
+                    <Route path="professor" element={
+                        <ProfessorRoute>
+                            <div>Proyectos del Profesor</div>
+                        </ProfessorRoute>
+                    }
+                    />
+                </Route>
             </Route>
 
             <Route path="*" element={<Layout />}>
