@@ -14,9 +14,29 @@ export function UserMenu() {
   const { state, actions } = useAuth();
   const user = state.user;
 
+  const getUserRoleText = (role) => {
+    const roleMap = {
+      'professor': 'Profesor',
+      'student': 'Estudiante',
+    };
+    return roleMap[role] || role;
+  };
+
+  const getUserFullName = (user) => {
+    if (!user) return '';
+    if (user.first_name && user.last_name) {
+      return `${user.first_name} ${user.last_name}`;
+    }
+    return user.name || '';
+  };
+
   const handleLogout = () => {
     actions.logout();
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -34,9 +54,12 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         <div className="px-2 py-1.5">
           <div className="flex flex-col">
-            <span className="font-medium text-sm">{user?.name}</span>
+            <span className="font-medium text-sm">{getUserFullName(user)}</span>
             <span className="text-xs text-muted-foreground">
-              {user?.role === 'professor' ? 'Profesor' : 'Estudiante'}
+              {getUserRoleText(user.role)}
+            </span>
+            <span className="text-xs text-muted-foreground mt-0.5">
+              {user.email}
             </span>
           </div>
         </div>

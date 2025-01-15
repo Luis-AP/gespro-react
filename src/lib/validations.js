@@ -4,7 +4,7 @@ export const patterns = {
         message: "El email no es válido",
     },
     password: {
-        value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+        value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,}$/,
         message:
             "La contraseña debe tener al menos 8 caracteres, una letra y un número",
     },
@@ -22,7 +22,7 @@ export const loginSchema = {
     password: {
         required: "La contraseña es requerida",
         minLength: {
-            value: 8,
+            value: 4,
             message: "La contraseña debe tener al menos 8 caracteres",
         },
     },

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import HeroSection from "@/components/HeroSection";
@@ -11,25 +12,37 @@ import authService from "@/services/authService";
 function Login() {
   const [currentTab, setCurrentTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { actions } = useAuth();
 
   const handleLogin = async (credentials) => {
     setIsLoading(true);
+    setError(null);
     try {
-      const response = await authService.login(credentials);
-      actions.login(response.token);
+        const response = await authService.login(credentials);
+        await actions.login({
+            token: response.token,
+            user: response.user
+        });
+    } catch (error) {
+      setError(error.data?.message || error.message || 'Ha ocurrido un error al iniciar sesión');
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
   const handleRegister = async (studentData) => {
     setIsLoading(true);
     try {
-      const response = await authService.register(studentData);
-      actions.login(response.token);
+        const response = await authService.register(studentData);
+        await actions.login({
+            token: response.token,
+            user: response.user
+        });
+    } catch (error) {
+        console.error('Register error:', error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
@@ -63,6 +76,11 @@ function Login() {
               </TabsList>
 
               <TabsContent value="login">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
                 <LoginForm 
                   onSubmit={handleLogin}
                   isLoading={isLoading}

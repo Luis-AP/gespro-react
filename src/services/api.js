@@ -8,16 +8,35 @@ class ApiError extends Error {
   }
 }
 
-const defaultHeaders = {
-  'Content-Type': 'application/json',
-};
-
 async function handleResponse(response) {
-  const data = await response.json();
+  if (!response) {
+    throw new ApiError(
+      'No se pudo conectar con el servidor. Por favor, intente más tarde.',
+      0,
+      { type: 'connection_error' }
+    );
+  }
+
+  const contentType = response.headers.get('content-type');
+  let data;
+  
+  try {
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+  } catch (error) {
+    throw new ApiError(
+      'Error al procesar la respuesta del servidor',
+      response.status,
+      { type: 'parse_error' }
+    );
+  }
   
   if (!response.ok) {
     throw new ApiError(
-      data.message || 'Ha ocurrido un error',
+      data.mensaje || data.message || 'Ha ocurrido un error',
       response.status,
       data
     );
@@ -27,7 +46,7 @@ async function handleResponse(response) {
 }
 
 export async function get(endpoint, token = null) {
-  const headers = { ...defaultHeaders };
+  const headers = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -35,36 +54,44 @@ export async function get(endpoint, token = null) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'GET',
     headers,
-  });
+  }).catch(() => null);
 
   return handleResponse(response);
 }
 
 export async function post(endpoint, data = null, token = null) {
-  const headers = { ...defaultHeaders };
+  const headers = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (!(data instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'POST',
     headers,
-    body: data ? JSON.stringify(data) : null,
-  });
+    body: data instanceof FormData ? data : JSON.stringify(data),
+  }).catch(() => null);
 
   return handleResponse(response);
 }
 
 export async function patch(endpoint, data = null, token = null) {
-  const headers = { ...defaultHeaders };
+  const headers = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (!(data instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'PATCH',
     headers,
-    body: data ? JSON.stringify(data) : null,
+    body: data instanceof FormData ? data : JSON.stringify(data),
   });
 
   return handleResponse(response);
