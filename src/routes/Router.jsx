@@ -14,6 +14,7 @@ import {
     StudentRoute,
 } from "@/routes/ProtectedRoute";
 import StudentDashboard from "../pages/StudentDashboard/StudentDashboard";
+import StudentProjects from "../pages/Projects/StudentProjects";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -50,7 +51,7 @@ const router = createBrowserRouter(
                         path="student"
                         element={
                             <StudentRoute>
-                                <div>Proyectos del Estudiante</div>
+                                <StudentProjects />
                             </StudentRoute>
                         }
                     />
