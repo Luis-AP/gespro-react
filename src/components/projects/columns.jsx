@@ -1,49 +1,8 @@
-import { Badge } from "@/components/ui/badge";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Info } from "lucide-react";
+import { StatusBadge, TypeBadge } from "../CustomBadges";
+import ActionButton from "../ActionButton";
 
-const ActionButton = ({ icon: Icon, label, onClick }) => (
-    <TooltipProvider>
-        <Tooltip delayDuration={300}>
-            <TooltipTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8"
-                    onClick={onClick}
-                >
-                    <Icon className="h-4 w-4" />
-                    <span className="sr-only">{label}</span>
-                </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-                <p>{label}</p>
-            </TooltipContent>
-        </Tooltip>
-    </TooltipProvider>
-);
-
-const StatusBadge = ({ status }) => {
-    return (
-        <Badge variant={status === "borrador" ? "outline" : "default"}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-        </Badge>
-    );
-};
-
-const TypeBadge = ({ isGroup }) => {
-    return (
-        <Badge variant={isGroup ? "default" : "outline"}>
-            {isGroup ? "Grupal" : "Individual"}
-        </Badge>
-    );
-};
+import projectsService from "../../services/projectsService";
 
 export const studentColumns = [
     {
@@ -112,14 +71,18 @@ export const studentColumns = [
                         icon={Edit}
                         label="Editar"
                         onClick={() => {
-                            console.log("Editar proyecto", project);
+                            if (project.onEdit) {
+                                project.onEdit(project);
+                            }
                         }}
                     />
                     <ActionButton
                         icon={Trash2}
                         label="Eliminar"
                         onClick={() => {
-                            console.log("Eliminar proyecto", project);
+                            if (project.onDelete) {
+                                project.onDelete(project.id);
+                            }
                         }}
                     />
                 </div>

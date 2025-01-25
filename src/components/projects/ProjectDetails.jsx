@@ -5,7 +5,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import {
     Calendar,
     GraduationCap,
@@ -17,6 +16,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
+import { StatusBadge } from "../CustomBadges";
 
 export function ProjectDetails({ project, open, onOpenChange }) {
     if (!project) return null;
@@ -69,6 +70,24 @@ export function ProjectDetails({ project, open, onOpenChange }) {
                         </Button>
                     </div>
                     <div className="flex items-center gap-4">
+                        <GraduationCap className="h-5 w-5 text-green-500" />
+                        <div>
+                            <p className="text-sm font-medium mb-1">
+                                Calificación
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                {project.grade ?? "-"}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <Clock className="h-5 w-5 text-yellow-500" />
+                        <div>
+                            <p className="text-sm font-medium mb-1">Estado</p>
+                            <StatusBadge status={project.status} />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
                         <Calendar className="h-5 w-5 text-blue-500" />
                         <div>
                             <p className="text-sm font-medium mb-1">
@@ -88,27 +107,6 @@ export function ProjectDetails({ project, open, onOpenChange }) {
                             <p className="text-sm text-gray-500">
                                 {formatDate(project.updated_at)}
                             </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <GraduationCap className="h-5 w-5 text-green-500" />
-                        <div>
-                            <p className="text-sm font-medium mb-1">
-                                Calificación
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                {project.grade ?? "-"}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Clock className="h-5 w-5 text-yellow-500" />
-                        <div>
-                            <p className="text-sm font-medium mb-1">Estado</p>
-                            <Badge variant="default">
-                                {project.status.charAt(0).toUpperCase() +
-                                    project.status.slice(1)}
-                            </Badge>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
