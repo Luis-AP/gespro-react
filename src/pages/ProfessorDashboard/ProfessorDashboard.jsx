@@ -21,20 +21,18 @@ const ProfessorDashboard = () => {
     const user = state.user;
 
     useEffect(() => {
-      fetchActivities();
-  }, [user]);
+        fetchActivities();
+    }, [user]);
 
     const fetchActivities = async () => {
         try {
             setIsLoading(true);
-            const response = await activitiesService.getActivities({ 
-                professorId: user.id 
-            });
+            const activities = await activitiesService.getActivities();
+            setActivities(activities);
             toast({
                 title: "Éxito",
                 description: "Actividades cargadas correctamente",
             });
-            setActivities(response.activities);
         } catch (error) {
             toast({
                 title: "Error",
@@ -48,7 +46,9 @@ const ProfessorDashboard = () => {
 
     const handleViewDetails = async (activity) => {
         try {
-            const response = await activitiesService.getActivityById(activity.id);
+            const response = await activitiesService.getActivityById(
+                activity.id
+            );
             setSelectedActivity(response.activity);
             setDetailsOpen(true);
         } catch (error) {
@@ -70,16 +70,18 @@ const ProfessorDashboard = () => {
             setIsLoading(true);
             const newActivityData = {
                 ...activityData,
-                professorId: user.id
+                professorId: user.id,
             };
-            
-            await activitiesService.createActivity(newActivityData);
-            
+
+            const response = await activitiesService.createActivity(
+                newActivityData
+            );
+
             toast({
                 title: "Éxito",
                 description: "Actividad creada correctamente",
             });
-            
+
             setFormOpen(false);
             fetchActivities();
         } catch (error) {
@@ -108,9 +110,9 @@ const ProfessorDashboard = () => {
                     </Button>
                 </div>
             </div>
-            <DataTable 
-                columns={columns} 
-                data={dataWithViewDetails} 
+            <DataTable
+                columns={columns}
+                data={dataWithViewDetails}
                 isLoading={isLoading}
             />
             <ActivityDetails

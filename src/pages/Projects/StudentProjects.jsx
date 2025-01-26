@@ -44,7 +44,7 @@ const StudentProjects = () => {
         try {
             setIsLoading(true);
             const response = await projectsService.getProjects();
-            setProjects(response.projects);
+            setProjects(response);
         } catch (error) {
             console.error(error);
         }
@@ -127,7 +127,7 @@ const StudentProjects = () => {
                 onOpenChange={setDetailsOpen}
             />
             <ProjectForm
-                project={selectedProject}
+                project={selectedProject || {}}
                 open={formOpen}
                 onOpenChange={setFormOpen}
                 isLoading={isLoading}

@@ -1,40 +1,27 @@
-import { get, post } from "./api";
+import { get, post, remove } from "./api";
 import { simulateResponse } from "./api";
 import projectsData from "./project-data";
+import Cookies from "js-cookie";
 
 class ProjectsService {
     async getProjects(filters = {}) {
+        const token = Cookies.get("token");
         try {
-            let filteredProjects = [...projectsData.projects];
-
-            if (filters.studentId) {
-                filteredProjects = filteredProjects.filter(
-                    (project) =>
-                        project.studentId === parseInt(filters.studentId)
-                );
-            }
-
-            return simulateResponse({
-                projects: filteredProjects,
-            });
+            const queryParams = new URLSearchParams(filters).toString();
+            const endpoint = `/projects?${queryParams}`;
+            const response = await get(endpoint, token);
+            return response;
         } catch (error) {
             throw error;
         }
     }
 
     async deleteProject(projectId) {
+        const token = Cookies.get("token");
         try {
-            const projectIndex = projectsData.projects.findIndex(
-                (project) => project.id === projectId
-            );
-
-            if (projectIndex === -1) {
-                throw new Error("Project not found");
-            }
-
-            projectsData.projects.splice(projectIndex, 1);
-
-            return simulateResponse({});
+            const endpoint = `/projects/${projectId}`;
+            const response = await remove(endpoint, token);
+            return response;
         } catch (error) {
             throw error;
         }
