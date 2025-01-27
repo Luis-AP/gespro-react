@@ -10,11 +10,11 @@ const MemberListItem = ({ member, onDelete }) => {
         <Avatar className="h-10 w-10">
           <AvatarImage src={member.avatarUrl} alt={member.name} />
           <AvatarFallback>
-            {member.name.split(' ').map(n => n[0]).join('')}
+          {`${member.first_name[0]}${member.last_name[0]}`}
           </AvatarFallback>
         </Avatar>
         <div>
-          <h4 className="text-sm font-medium">{member.name}</h4>
+          <h4 className="text-sm font-medium">{member.first_name} {member.last_name}</h4>
           <p className="text-sm text-slate-500">
             {member.email} • {member.role}
           </p>

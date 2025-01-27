@@ -1,59 +1,114 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { Toaster } from '@/components/ui/toaster';
 import MemberListItem from './MemberListItem';
 import DeleteMemberDialog from './DeleteMemberDialog';
 import AddMemberDialog from './AddMemberDialog';
+import ProjectsService from '../../../services/projectsService';
+import UserService from '../../../services/userService';
+import MemberSkeleton from './MemberSkeleton';
+
 
 const GroupManagement = () => {
-  // Estados para la lista de miembros
-  const [members, setMembers] = useState([
-    {
-      id: 1,
-      name: 'Diego Omar Yapura',
-      email: 'diego@ejemplo.com',
-      role: 'Integrante',
-      avatarUrl: '/api/placeholder/40/40'
-    },
-    {
-      id: 2,
-      name: 'María González',
-      email: 'maria@ejemplo.com',
-      role: 'Propietario',
-      avatarUrl: '/api/placeholder/40/40'
-    }
-  ]);
+  const PROJECT_ID = 1;
 
-  // Estados para diálogos y selección
+  const { toast } = useToast();
+  const [members, setMembers] = useState([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Datos de ejemplo de personas disponibles
-  const availablePeople = [
-    { id: 3, name: 'Juan Pérez', email: 'juan@ejemplo.com', avatarUrl: '/api/placeholder/40/40' },
-    { id: 4, name: 'Ana Silva', email: 'ana@ejemplo.com', avatarUrl: '/api/placeholder/40/40' },
-    { id: 5, name: 'Carlos López', email: 'carlos@ejemplo.com', avatarUrl: '/api/placeholder/40/40' },
-  ];
+  useEffect(() => {
+    loadProjectData();
+  }, []);
 
-  // Manejadores de eventos
+  const loadStudentsInfo = async (memberIds) => {
+    try {
+      const studentsInfo = await Promise.all(
+        memberIds.map(async (memberId) => {
+          const studentInfo = await UserService.getStudent(memberId);
+          return {
+            ...studentInfo,
+            id: memberId,
+            role: 'Integrante',
+          };
+        })
+      );
+      return studentsInfo;
+    } catch (error) {
+      console.error('Error loading students info:', error);
+      throw error;
+    }
+  };
+
+  const loadProjectData = async () => {
+    try {
+      setLoading(true);
+      const project = await ProjectsService.getProjectById(PROJECT_ID);
+      
+      if (project && project.member_ids) {
+        const membersInfo = await loadStudentsInfo(project.member_ids);
+        setMembers(membersInfo);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los miembros del grupo",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteClick = (member) => {
     setMemberToDelete(member);
     setIsDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (memberToDelete) {
-      setMembers(members.filter(member => member.id !== memberToDelete.id));
+      try {
+        await ProjectsService.removeMember(PROJECT_ID, memberToDelete.id);
+        setMembers(members.filter(member => member.id !== memberToDelete.id));
+        toast({
+          title: "Éxito",
+          description: "Miembro eliminado correctamente",
+        });
+      } catch (error) {
+        const errorMessage = error.data?.mensaje || "No se pudo eliminar al miembro";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+      setIsDeleteDialogOpen(false);
+      setMemberToDelete(null);
     }
-    setIsDeleteDialogOpen(false);
-    setMemberToDelete(null);
   };
 
-  const handleAddMember = (person) => {
+  const handleAddMember = async (person) => {
     if (person) {
-      setMembers([...members, { ...person, role: 'Integrante' }]);
+      try {
+        await ProjectsService.addMember(PROJECT_ID, person.id);
+        setMembers([...members, { ...person, role: 'Integrante' }]);
+        toast({
+          title: "Éxito",
+          description: "Miembro añadido correctamente",
+        });
+      } catch (error) {
+        const errorMessage = error.data?.mensaje || "No se pudo añadir al miembro";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
       setIsAddDialogOpen(false);
       setSelectedPerson(null);
     }
@@ -64,19 +119,31 @@ const GroupManagement = () => {
       <Card className="w-full max-w-2xl">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-lg font-semibold">Gestionar grupo</h2>
-          <Button variant="default" onClick={() => setIsAddDialogOpen(true)}>
+          <Button 
+            variant="default" 
+            onClick={() => setIsAddDialogOpen(true)}
+            disabled={loading}
+          >
             Añadir integrante
           </Button>
         </div>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            {members.map((member) => (
-              <MemberListItem
-                key={member.id}
-                member={member}
-                onDelete={handleDeleteClick}
-              />
-            ))}
+            {loading ? (
+              <>
+                <MemberSkeleton />
+                <MemberSkeleton />
+                <MemberSkeleton />
+              </>
+            ) : (
+              members.map((member) => (
+                <MemberListItem
+                  key={member.id}
+                  member={member}
+                  onDelete={handleDeleteClick}
+                />
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
@@ -85,7 +152,7 @@ const GroupManagement = () => {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        memberName={memberToDelete?.name}
+        memberName={`${memberToDelete?.first_name} ${memberToDelete?.last_name}`}
       />
 
       <AddMemberDialog
@@ -95,10 +162,11 @@ const GroupManagement = () => {
           setSelectedPerson(null);
         }}
         onAdd={handleAddMember}
-        availablePeople={availablePeople}
+        searchStudents={(term) => ProjectsService.searchStudents(term)}
         selectedPerson={selectedPerson}
         onSelectPerson={setSelectedPerson}
       />
+      <Toaster />
     </>
   );
 };

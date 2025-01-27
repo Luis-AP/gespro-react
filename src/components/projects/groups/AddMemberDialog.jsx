@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { X } from 'lucide-react';
 import {
   Dialog,
@@ -23,35 +23,41 @@ const AddMemberDialog = ({
   isOpen,
   onClose,
   onAdd,
-  availablePeople,
+  searchStudents,
   selectedPerson,
   onSelectPerson,
 }) => {
   const [inputValue, setInputValue] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Para futura integración con API
   const debouncedSearch = useCallback(
-    debounce((value) => {
-      // Aquí iría la llamada a la API
-      console.log('Searching:', value);
+    debounce(async (value) => {
+      if (value.length >= 2) {
+        setIsSearching(true);
+        try {
+          const results = await searchStudents(value);
+          setSearchResults(results || []);
+        } catch (error) {
+          console.error('Error searching students:', error);
+          setSearchResults([]);
+        } finally {
+          setIsSearching(false);
+        }
+      }
     }, 300),
-    []
+    [searchStudents]
   );
 
   const handleSearchChange = (value) => {
     setInputValue(value);
-    debouncedSearch(value);
+    if (value.length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+    } else {
+      debouncedSearch(value);
+    }
   };
-
-  // Filtra las personas basado en el valor del input
-  const filteredPeople = inputValue.length >= 1
-    ? availablePeople.filter(person =>
-        person.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-        person.email.toLowerCase().includes(inputValue.toLowerCase())
-      )
-    : [];
-
-  const shouldShowResults = inputValue.length >= 1;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -68,48 +74,52 @@ const AddMemberDialog = ({
                 onValueChange={handleSearchChange}
               />
               <CommandList>
-                {shouldShowResults && (
-                  <>
-                    {filteredPeople.length === 0 ? (
-                      <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-                    ) : (
-                      <CommandGroup>
-                        {filteredPeople.map((person) => (
-                          <CommandItem
-                            key={person.id}
-                            onSelect={() => {
-                              onSelectPerson(person);
-                              setInputValue('');
-                            }}
-                            className="flex items-center space-x-2 p-2"
-                          >
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={person.avatarUrl} alt={person.name} />
-                              <AvatarFallback>
-                                {person.name.split(' ').map(n => n[0]).join('')}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium">{person.name}</span>
-                              <span className="text-xs text-slate-500">{person.email}</span>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    )}
-                  </>
+                {inputValue.length < 2 ? (
+                  <CommandEmpty>Ingresa al menos 2 caracteres para buscar</CommandEmpty>
+                ) : isSearching ? (
+                  <CommandEmpty>Buscando...</CommandEmpty>
+                ) : searchResults.length === 0 ? (
+                  <CommandEmpty>No se encontraron resultados</CommandEmpty>
+                ) : (
+                  <CommandGroup>
+                    {searchResults.map((person) => (
+                      <CommandItem
+                        key={person.id}
+                        value={`${person.first_name} ${person.last_name}`}
+                        onSelect={() => {
+                          onSelectPerson(person);
+                          setInputValue('');
+                          setSearchResults([]);
+                        }}
+                        className="flex items-center space-x-2 p-2"
+                      >
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            {person.first_name[0]}{person.last_name[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {person.first_name} {person.last_name}
+                          </span>
+                          <span className="text-xs text-slate-500">{person.email}</span>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
                 )}
               </CommandList>
             </Command>
           ) : (
             <div className="flex items-center space-x-2 bg-blue-50 p-2 rounded-lg">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={selectedPerson.avatarUrl} alt={selectedPerson.name} />
                 <AvatarFallback>
-                  {selectedPerson.name.split(' ').map(n => n[0]).join('')}
+                  {selectedPerson.first_name[0]}{selectedPerson.last_name[0]}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">{selectedPerson.name}</span>
+              <span className="text-sm font-medium">
+                {selectedPerson.first_name} {selectedPerson.last_name}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -130,7 +140,7 @@ const AddMemberDialog = ({
             disabled={!selectedPerson}
             onClick={() => onAdd(selectedPerson)}
           >
-            {selectedPerson ? `Añadir ${selectedPerson.name.split(' ')[0]}` : 'Añadir'}
+            {selectedPerson ? `Añadir ${selectedPerson.first_name}` : 'Añadir'}
           </Button>
         </DialogFooter>
       </DialogContent>
