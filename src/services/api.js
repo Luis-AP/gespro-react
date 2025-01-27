@@ -97,6 +97,20 @@ export async function patch(endpoint, data = null, token = null) {
   return handleResponse(response);
 }
 
+export async function remove(endpoint, token = null) {
+    const headers = {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'DELETE',
+        headers,
+    });
+    
+    return handleResponse(response);
+}
+
 export function simulateResponse(data, delay = 500) {
   return new Promise((resolve) => {
     setTimeout(() => resolve(data), delay);

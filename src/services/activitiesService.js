@@ -1,69 +1,63 @@
-import { get, post } from './api';
-import { simulateResponse, simulateError } from './api';
-import { activitiesData } from './activity-data';
+import { get, post } from "./api";
+import { simulateResponse, simulateError } from "./api";
+import { activitiesData } from "./activity-data";
+import Cookies from "js-cookie";
 
 class ActivitiesService {
-  async getActivities(filters = {}) {
-    try {
-      let filteredActivities = [...activitiesData.activities];
-      
-      if (filters.professorId) {
-        filteredActivities = filteredActivities.filter(
-          activity => activity.professorId === parseInt(filters.professorId)
-        );
-      }
-
-      return simulateResponse({
-        activities: filteredActivities
-      });
-    } catch (error) {
-      throw error;
+    async getActivities() {
+        const token = Cookies.get("token");
+        if (!token) {
+            throw new Error("No authentication token found");
+        }
+        return get("/activities", token);
     }
-}
 
-  async getActivityById(id) {
-    try {
-      // Cuando esté listo el backend: return get(`/activities/${id}`, token);
-      
-      const activity = activitiesData.activities.find(
-        activity => activity.id === parseInt(id)
-      );
+    async getActivityById(id) {
+        try {
+            // Cuando esté listo el backend: return get(`/activities/${id}`, token);
 
-      if (!activity) {
-        return simulateError('Actividad no encontrada', 404);
-      }
+            const activity = activitiesData.activities.find(
+                (activity) => activity.id === parseInt(id)
+            );
 
-      return simulateResponse({ activity });
-    } catch (error) {
-      throw error;
+            if (!activity) {
+                return simulateError("Actividad no encontrada", 404);
+            }
+
+            return simulateResponse({ activity });
+        } catch (error) {
+            throw error;
+        }
     }
-  }
 
-  async createActivity(activityData, token) {
-    try {
-      // Cuando esté listo el backend: return post('/activities', activityData, token);
-      
-      // Validaciones básicas
-      if (!activityData.name || !activityData.dueDate || !activityData.minGrade || !activityData.professorId) {
-        return simulateError('Faltan campos requeridos', 400);
-      }
+    async createActivity(activityData) {
+        try {
+            // Cuando esté listo el backend: return post('/activities', activityData, token);
+            // Validaciones básicas
 
-      const newId = Math.max(...activitiesData.activities.map(a => a.id)) + 1;
+            const token = Cookies.get("token");
+            if (!token) {
+                throw new Error("No authentication token found");
+            }
+            // Format yyyy-mm-dd
+            let due_date = new Date(activityData.dueDate);
+            due_date = due_date.toISOString().split("T")[0];
 
-      const newActivity = {
-        id: newId,
-        ...activityData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      activitiesData.activities.push(newActivity);
-
-      return simulateResponse({ activity: newActivity });
-    } catch (error) {
-      throw error;
+            return post(
+                "/activities",
+                {
+                    name: activityData.name,
+                    description: activityData.description,
+                    due_date: due_date,
+                    min_grade: activityData.minGrade,
+                    professor_id: 1,
+                },
+                token
+            );
+        } catch (error) {
+            throw error;
+        }
     }
-  }
 }
 
 export default new ActivitiesService();
