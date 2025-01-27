@@ -16,6 +16,17 @@ class ProjectsService {
         }
     }
 
+    async createProject(project) {
+        const token = Cookies.get("token");
+        try {
+            const endpoint = "/projects";
+            const response = await post(endpoint, project, token);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async deleteProject(projectId) {
         const token = Cookies.get("token");
         try {

@@ -43,7 +43,7 @@ const ActivityForm = ({
             setError(null);
             await onSubmit(data);
         } catch (err) {
-            setError(err.message || "Ha ocurrido un error al registrarse");
+            setError(err.message || "Ha ocurrido un error al guardar la actividad");
         }
     };
 

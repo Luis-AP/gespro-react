@@ -47,6 +47,8 @@ const StudentProjects = () => {
             setProjects(response);
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -57,12 +59,14 @@ const StudentProjects = () => {
 
     const handleSubmitNewProject = async (project) => {
         try {
-            // Llamar al servicio para crear un nuevo proyecto
-            //...
-            // Cerrar el formulario
+            setIsLoading(true);
+            const response = await projectsService.createProject(project);
             setFormOpen(false);
+            fetchProjects();
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -134,7 +138,6 @@ const StudentProjects = () => {
                 onSubmit={(project) => handleSubmitNewProject(project)}
             />
             <ProjectEditForm
-                project={selectedProject}
                 open={editFormOpen}
                 onOpenChange={setEditFormOpen}
                 isLoading={isLoading}

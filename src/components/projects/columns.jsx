@@ -1,8 +1,6 @@
-import { Edit, Trash2, Info } from "lucide-react";
+import { Edit, Trash2, Info, UserPen } from "lucide-react";
 import { StatusBadge, TypeBadge } from "../CustomBadges";
 import ActionButton from "../ActionButton";
-
-import projectsService from "../../services/projectsService";
 
 export const studentColumns = [
     {
@@ -83,6 +81,16 @@ export const studentColumns = [
                             if (project.onDelete) {
                                 project.onDelete(project.id);
                             }
+                        }}
+                    />
+                    <ActionButton
+                        icon={UserPen}
+                        label="Integrantes"
+                        onClick={() => {
+                            alert("Integrantes");
+                            // if (project.onMembers) {
+                            //     project.onMembers(project);
+                            // }
                         }}
                     />
                 </div>
