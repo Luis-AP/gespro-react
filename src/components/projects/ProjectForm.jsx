@@ -33,6 +33,7 @@ const ProjectForm = ({
         register,
         control,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm();
 
@@ -42,14 +43,20 @@ const ProjectForm = ({
     const [loadingActivities, setLoadingActivities] = useState(false);
 
     useEffect(() => {
-        setSelectedActivity(activity);
-        handleLoadActivities();
-    }, [activity]);
+        if (open) {
+            handleLoadActivities();
+            setSelectedActivity(activity);
+        }
+    }, [open]);
 
     const onSubmitForm = async (data) => {
         try {
             setError(null);
             await onSubmit({ ...data, activity_id: selectedActivity?.id });
+
+            setSelectedActivity(null);
+            setInputValue("");
+            reset();
         } catch (err) {
             setError(
                 err.message || "Ha ocurrido un error al crear el proyecto"

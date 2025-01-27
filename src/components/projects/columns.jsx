@@ -9,17 +9,25 @@ export const studentColumns = [
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue("title")}</div>
         ),
-        size: "w-[35%]",
+        size: "w-[25%]",
     },
     {
         accessorKey: "professor",
         header: "Profesor",
-        cell: ({ row }) => (
-            <div className="flex justify-start gap-2">
-                {row.getValue("professor")}
-            </div>
-        ),
-        size: "w-[20%]",
+        cell: ({ row }) => {
+            const professor = row.getValue("professor");
+            return (
+                <div className="flex flex-col gap-1">
+                    <span className="font-medium">
+                        {professor.first_name} {professor.last_name}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                        {professor.email}
+                    </span>
+                </div>
+            );
+        },
+        size: "w-[25%]",
     },
     {
         accessorKey: "is_group",
@@ -96,6 +104,6 @@ export const studentColumns = [
                 </div>
             );
         },
-        size: "w-[15%]",
+        size: "w-[20%]",
     },
 ];

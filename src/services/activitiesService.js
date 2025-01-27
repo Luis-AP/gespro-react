@@ -1,6 +1,4 @@
 import { get, post } from "./api";
-import { simulateResponse, simulateError } from "./api";
-import { activitiesData } from "./activity-data";
 import Cookies from "js-cookie";
 
 class ActivitiesService {
@@ -10,24 +8,6 @@ class ActivitiesService {
             throw new Error("No authentication token found");
         }
         return get("/activities", token);
-    }
-
-    async getActivityById(id) {
-        try {
-            // Cuando esté listo el backend: return get(`/activities/${id}`, token);
-
-            const activity = activitiesData.activities.find(
-                (activity) => activity.id === parseInt(id)
-            );
-
-            if (!activity) {
-                return simulateError("Actividad no encontrada", 404);
-            }
-
-            return simulateResponse({ activity });
-        } catch (error) {
-            throw error;
-        }
     }
 
     async createActivity(activityData) {

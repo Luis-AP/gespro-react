@@ -1,6 +1,4 @@
 import { get, post, remove } from "./api";
-import { simulateResponse } from "./api";
-import projectsData from "./project-data";
 import Cookies from "js-cookie";
 
 class ProjectsService {
