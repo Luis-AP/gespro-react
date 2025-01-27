@@ -14,6 +14,7 @@ import {
     StudentRoute,
 } from "@/routes/ProtectedRoute";
 import StudentDashboard from "../pages/StudentDashboard/StudentDashboard";
+import GroupManagement from "../components/projects/groups/GroupManagement";
 import StudentProjects from "../pages/Projects/StudentProjects";
 
 const router = createBrowserRouter(
@@ -67,7 +68,9 @@ const router = createBrowserRouter(
             </Route>
 
             <Route path="*" element={<Layout />}>
-                <Route path="*" element={<h1>404 Not Found</h1>} />
+                <Route path="*" element={
+                    <GroupManagement />
+                } />
             </Route>
         </Route>
     )
