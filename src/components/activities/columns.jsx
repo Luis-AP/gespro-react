@@ -48,10 +48,10 @@ export const professorColumns = [
         size: "w-[40%]",
     },
     {
-        accessorKey: "dueDate",
+        accessorKey: "due_date",
         header: "Fecha de entrega",
         cell: ({ row }) => {
-            const date = new Date(row.getValue("dueDate"));
+            const date = new Date(row.getValue("due_date"));
             return (
                 <div className="flex justify-start">
                     {date.toLocaleDateString("es-ES", {
@@ -65,10 +65,10 @@ export const professorColumns = [
         size: "w-[20%]",
     },
     {
-        accessorKey: "minGrade",
+        accessorKey: "min_grade",
         header: "Nota mínima",
         cell: ({ row }) => (
-            <div className="text-center">{row.getValue("minGrade")}</div>
+            <div className="text-center">{row.getValue("min_grade")}</div>
         ),
         size: "w-[10%]",
     },
@@ -77,7 +77,7 @@ export const professorColumns = [
         header: "Estado",
         cell: ({ row }) => (
             <div className="flex justify-start gap-2">
-                <StatusBadge dueDate={row.getValue("dueDate")} />
+                <StatusBadge dueDate={row.getValue("due_date")} />
             </div>
         ),
         size: "w-[15%]",
