@@ -108,6 +108,9 @@ export const projectSchema = {
         pattern: {
             value: /^(https:\/\/github.com\/|https:\/\/gitlab.com\/)([a-zA-Z0-9-]+\/[a-zA-Z0-9-]+)$/,
             message: "El enlace debe ser de GitHub o GitLab",
-        },     
+        },
     },
-}; 
+    activity: {
+        required: "La actividad es requerida",
+    },
+};

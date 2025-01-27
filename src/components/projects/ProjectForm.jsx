@@ -20,6 +20,7 @@ import {
 import activitiesService from "../../services/activitiesService";
 import { X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Controller } from "react-hook-form";
 
 const ProjectForm = ({
     activity = null,
@@ -46,6 +47,7 @@ const ProjectForm = ({
         if (open) {
             handleLoadActivities();
             setSelectedActivity(activity);
+            reset();
         }
     }, [open]);
 
@@ -56,7 +58,6 @@ const ProjectForm = ({
 
             setSelectedActivity(null);
             setInputValue("");
-            reset();
         } catch (err) {
             setError(
                 err.message || "Ha ocurrido un error al crear el proyecto"
@@ -147,76 +148,106 @@ const ProjectForm = ({
                     </div>
 
                     {/* Actividad, se consulta a la API por las actividades */}
-                    <div className="flex flex-col space-y-4">
-                        {selectedActivity ? (
-                            <div className="flex items-center space-x-2 bg-blue-50 p-2 rounded-lg">
-                                <span className="text-sm font-medium">
-                                    {selectedActivity.name}
-                                </span>
-                                {!activity && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="ml-auto"
-                                        onClick={() => {
-                                            setSelectedActivity(null);
-                                        }}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                )}
-                            </div>
-                        ) : (
-                            <Command className="rounded-lg border shadow-md">
-                                <CommandInput
-                                    placeholder="Buscar por nombre de la actividad"
-                                    value={inputValue}
-                                    onValueChange={handleSearchChange}
-                                />
-                                <CommandList>
-                                    {shouldShowResults && (
-                                        <>
-                                            {filteredActivities.length === 0 ? (
-                                                <CommandEmpty>
-                                                    No se encontraron
-                                                    resultados.
-                                                </CommandEmpty>
-                                            ) : (
-                                                <CommandGroup>
-                                                    {filteredActivities.map(
-                                                        (activity) => (
-                                                            <CommandItem
-                                                                key={
-                                                                    activity.id
-                                                                }
-                                                                onSelect={() => {
-                                                                    setSelectedActivity(
-                                                                        activity
-                                                                    );
-                                                                    setInputValue(
-                                                                        ""
-                                                                    );
-                                                                }}
-                                                                className="flex items-center space-x-2 p-2"
-                                                            >
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-sm font-medium">
-                                                                        {
-                                                                            activity.name
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                            </CommandItem>
-                                                        )
-                                                    )}
-                                                </CommandGroup>
+                    <div className="space-y-2">
+                        <Controller
+                            name="activity"
+                            control={control}
+                            rules={projectSchema.activity}
+                            defaultValue={activity || null}
+                            render={({ field }) => (
+                                <>
+                                    {field.value ? (
+                                        <div className="flex items-center space-x-2 bg-blue-50 p-2 rounded-lg">
+                                            <span className="text-sm font-medium">
+                                                {field.value.name}
+                                            </span>
+                                            {!activity && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="ml-auto"
+                                                    onClick={() =>
+                                                        field.onChange(null)
+                                                    }
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
                                             )}
-                                        </>
+                                        </div>
+                                    ) : (
+                                        <Command
+                                            className={`rounded-lg border shadow-md ${
+                                                errors.activity
+                                                    ? "border-red-500"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <CommandInput
+                                                placeholder="Buscar por nombre de la actividad"
+                                                value={inputValue}
+                                                onValueChange={
+                                                    handleSearchChange
+                                                }
+                                            />
+                                            <CommandList>
+                                                {shouldShowResults && (
+                                                    <>
+                                                        {filteredActivities.length ===
+                                                        0 ? (
+                                                            <CommandEmpty>
+                                                                No se
+                                                                encontraron
+                                                                resultados.
+                                                            </CommandEmpty>
+                                                        ) : (
+                                                            <CommandGroup>
+                                                                {filteredActivities.map(
+                                                                    (
+                                                                        activity
+                                                                    ) => (
+                                                                        <CommandItem
+                                                                            key={
+                                                                                activity.id
+                                                                            }
+                                                                            onSelect={() => {
+                                                                                field.onChange(
+                                                                                    activity
+                                                                                );
+                                                                                setSelectedActivity(
+                                                                                    activity
+                                                                                );
+                                                                                setInputValue(
+                                                                                    ""
+                                                                                );
+                                                                            }}
+                                                                            className="flex items-center space-x-2 p-2"
+                                                                        >
+                                                                            <div className="flex flex-col">
+                                                                                <span className="text-sm font-medium">
+                                                                                    {
+                                                                                        activity.name
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                        </CommandItem>
+                                                                    )
+                                                                )}
+                                                            </CommandGroup>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </CommandList>
+                                        </Command>
                                     )}
-                                </CommandList>
-                            </Command>
-                        )}
+                                </>
+                            )}
+                        />
                     </div>
+                    {errors.activity && (
+                        <p className="text-sm text-red-500">
+                            {errors.activity.message}
+                        </p>
+                    )}
 
                     {/* Botón para guardar */}
                     <Button
