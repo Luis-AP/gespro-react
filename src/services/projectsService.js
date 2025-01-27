@@ -37,6 +37,44 @@ class ProjectsService {
             throw error;
         }
     }
+
+    async getProjectById(projectId) {
+      const projects = await this.getProjects();
+      return projects.find(project => project.id === projectId);
+    }
+
+    async addMember(projectId, studentId) {
+        const token = Cookies.get("token");
+        try {
+            const endpoint = `/projects/${projectId}/members`;
+            return await post(endpoint, { student_id: studentId }, token);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async removeMember(projectId, studentId) {
+        const token = Cookies.get("token");
+        try {
+            const endpoint = `/projects/${projectId}/members/${studentId}`;
+            return await remove(endpoint, token);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async searchStudents(searchTerm) {
+        const token = Cookies.get("token");
+        try {
+            if (!searchTerm || searchTerm.length < 2) {
+                return [];
+            }
+            const endpoint = `/users/students/search?q=${encodeURIComponent(searchTerm)}`;
+            return await get(endpoint, token);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default new ProjectsService();
