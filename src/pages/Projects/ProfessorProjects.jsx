@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 
 import ProjectFilterByActivity from "../../components/projects/ProjectFilterByActivity";
+import { useLocation } from "react-router-dom";
 
 const ProfessorProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -29,9 +30,19 @@ const ProfessorProjects = () => {
 
     const { toast } = useToast();
 
+    const location = useLocation();
+
     useEffect(() => {
-        fetchProjects();
-    }, [user]);
+        if (location.state?.activity) {
+            setSelectedActivity(location.state.activity);
+            toast({
+                title: "Actividad seleccionada",
+                description: `${location.state.activity.name}`,
+            });
+        } else {
+            fetchProjects();
+        }
+    }, [location.state, user]);
 
     useEffect(() => {
         if (selectedActivity) {
