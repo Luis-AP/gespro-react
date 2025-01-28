@@ -101,12 +101,22 @@ const StudentProjects = () => {
 
     const handleSubmitEditProject = async (project) => {
         try {
-            // Llamar al servicio para editar un proyecto
-            //...
-            // Cerrar el formulario
+            setIsLoading(true);
+            await projectsService.updateProject(project);
+
+            toast({
+                title: "Proyecto actualizado",
+                description: "El proyecto se ha actualizado correctamente",
+            });
             setEditFormOpen(false);
+            fetchProjects();
         } catch (error) {
-            console.error(error);
+            toast({
+                title: "Error",
+                description:
+                    error.message || "No se pudo actualizar el proyecto",
+                variant: "destructive",
+            });
         }
     };
 
@@ -170,6 +180,7 @@ const StudentProjects = () => {
                 onSubmit={(project) => handleSubmitNewProject(project)}
             />
             <ProjectEditForm
+                project={selectedProject}
                 open={editFormOpen}
                 onOpenChange={setEditFormOpen}
                 isLoading={isLoading}
