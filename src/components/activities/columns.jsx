@@ -42,9 +42,21 @@ export const professorColumns = [
     {
         accessorKey: "name",
         header: "Nombre",
-        cell: ({ row }) => (
-            <div className="font-medium">{row.getValue("name")}</div>
-        ),
+        cell: ({ row }) => {
+            const activity = row.original;
+            return (
+                <div
+                    className="font-medium cursor-pointer hover:underline"
+                    onClick={() => {
+                        if (activity.onProjects) {
+                            activity.onProjects(activity);
+                        }
+                    }}
+                >
+                    {row.getValue("name")}
+                </div>
+            );
+        },
         size: "w-[40%]",
     },
     {
