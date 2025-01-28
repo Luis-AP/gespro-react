@@ -1,4 +1,4 @@
-import { get, post, remove } from "./api";
+import { get, post, remove, patch } from "./api";
 import Cookies from "js-cookie";
 
 class ProjectsService {
@@ -25,6 +25,17 @@ class ProjectsService {
         }
     }
 
+    async updateProject(project) {
+        const token = Cookies.get("token");
+        try {
+            const endpoint = `/projects/${project.id}`;
+            const response = await patch(endpoint, project, token);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async deleteProject(projectId) {
         const token = Cookies.get("token");
         try {
@@ -37,8 +48,8 @@ class ProjectsService {
     }
 
     async getProjectById(projectId) {
-      const projects = await this.getProjects();
-      return projects.find(project => project.id === projectId);
+        const projects = await this.getProjects();
+        return projects.find((project) => project.id === projectId);
     }
 
     async addMember(projectId, studentId) {
@@ -67,7 +78,9 @@ class ProjectsService {
             if (!searchTerm || searchTerm.length < 2) {
                 return [];
             }
-            const endpoint = `/users/students/search?q=${encodeURIComponent(searchTerm)}`;
+            const endpoint = `/users/students/search?q=${encodeURIComponent(
+                searchTerm
+            )}`;
             return await get(endpoint, token);
         } catch (error) {
             throw error;
