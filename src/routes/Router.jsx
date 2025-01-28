@@ -16,6 +16,7 @@ import {
 import StudentDashboard from "../pages/StudentDashboard/StudentDashboard";
 import GroupManagement from "../components/projects/groups/GroupManagement";
 import StudentProjects from "../pages/Projects/StudentProjects";
+import ProfessorProjects from "../pages/Projects/ProfessorProjects";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -60,7 +61,7 @@ const router = createBrowserRouter(
                         path="professor"
                         element={
                             <ProfessorRoute>
-                                <div>Proyectos del Profesor</div>
+                                <ProfessorProjects />
                             </ProfessorRoute>
                         }
                     />
@@ -68,9 +69,7 @@ const router = createBrowserRouter(
             </Route>
 
             <Route path="*" element={<Layout />}>
-                <Route path="*" element={
-                    <GroupManagement />
-                } />
+                <Route path="*" element={<GroupManagement />} />
             </Route>
         </Route>
     )
