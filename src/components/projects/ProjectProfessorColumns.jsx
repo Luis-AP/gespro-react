@@ -1,4 +1,4 @@
-import { Info, NotebookPen } from "lucide-react";
+import { Info } from "lucide-react";
 import { StatusBadge, TypeBadge } from "../CustomBadges";
 import ActionButton from "../ActionButton";
 
@@ -52,15 +52,6 @@ export const ProjectProfessorColumns = [
                         onClick={() => {
                             if (project.onViewDetails) {
                                 project.onViewDetails(project);
-                            }
-                        }}
-                    />
-                    <ActionButton
-                        icon={NotebookPen}
-                        label="Calificar"
-                        onClick={() => {
-                            if (project.onGrade) {
-                                project.onGrade(project);
                             }
                         }}
                     />

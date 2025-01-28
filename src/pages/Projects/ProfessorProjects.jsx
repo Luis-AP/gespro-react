@@ -84,10 +84,17 @@ const ProfessorProjects = () => {
         fetchProjects();
     };
 
+    const handleProjectUpdate = (updatedProject) => {
+        setProjects((prevProjects) =>
+            prevProjects.map((project) =>
+                project.id === updatedProject.id ? updatedProject : project
+            )
+        );
+    };
+
     const dataWithViewDetails = projects.map((project) => ({
         ...project,
         onViewDetails: () => handleViewDetails(project),
-        onGrade: () => alert("Calificar proyecto: " + project.title),
     }));
 
     return (
@@ -108,6 +115,7 @@ const ProfessorProjects = () => {
                 isLoading={isLoading}
             />
             <ProjectDetails
+                onProjectUpdate={handleProjectUpdate}
                 project={selectedProject}
                 open={detailsOpen}
                 onOpenChange={setDetailsOpen}

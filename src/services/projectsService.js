@@ -86,6 +86,16 @@ class ProjectsService {
             throw error;
         }
     }
+
+    async gradeProject(projectId, grade) {
+        const token = Cookies.get("token");
+        try {
+            const endpoint = `/projects/${projectId}/grades`;
+            return await post(endpoint, { grade: grade }, token);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default new ProjectsService();
