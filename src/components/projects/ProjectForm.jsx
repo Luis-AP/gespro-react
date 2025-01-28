@@ -47,6 +47,7 @@ const ProjectForm = ({
         if (open) {
             handleLoadActivities();
             setSelectedActivity(activity);
+            setInputValue("");
             reset();
         }
     }, [open]);
@@ -55,9 +56,6 @@ const ProjectForm = ({
         try {
             setError(null);
             await onSubmit({ ...data, activity_id: selectedActivity?.id });
-
-            setSelectedActivity(null);
-            setInputValue("");
         } catch (err) {
             setError(
                 err.message || "Ha ocurrido un error al crear el proyecto"

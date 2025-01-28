@@ -2,7 +2,7 @@ import { Edit, Trash2, Info, UserPen } from "lucide-react";
 import { StatusBadge, TypeBadge } from "../CustomBadges";
 import ActionButton from "../ActionButton";
 
-export const studentColumns = [
+export const ProjectStudentColumns = [
     {
         accessorKey: "title",
         header: "Título",
@@ -95,10 +95,9 @@ export const studentColumns = [
                         icon={UserPen}
                         label="Integrantes"
                         onClick={() => {
-                            alert("Integrantes");
-                            // if (project.onMembers) {
-                            //     project.onMembers(project);
-                            // }
+                            if (project.onMemberManagement) {
+                                project.onMemberManagement(project);
+                            }
                         }}
                     />
                 </div>

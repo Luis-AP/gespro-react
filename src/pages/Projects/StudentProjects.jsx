@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
-import { studentColumns as columns } from "@/components/projects/columns";
-import { DataTable } from "@/components/projects/data-table";
+import { ProjectStudentColumns as columns } from "@/components/projects/ProjectStudentColumns";
+import { DataTable } from "@/components/projects/DataTable";
 
 import { ProjectDetails } from "@/components/projects/ProjectDetails";
 import ProjectForm from "@/components/projects/ProjectForm";
@@ -15,6 +15,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+
+import GroupManagement from "@/components/projects/groups/GroupManagement";
 
 const StudentProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -30,6 +32,8 @@ const StudentProjects = () => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     // Modal para confirmar la eliminación de un proyecto
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    // Modal para la gestión de grupos
+    const [groupManagementOpen, setGroupManagementOpen] = useState(false);
 
     const { state } = useAuth();
     const user = state.user;
@@ -145,11 +149,32 @@ const StudentProjects = () => {
         }
     };
 
+    const handleMemberManagement = (project) => {
+        setSelectedProject(project);
+        setGroupManagementOpen(true);
+    };
+
+    const handleUpdateProject = async (project) => {
+        let updatedProject = await projectsService.getProjectById(project.id);
+        //Update professor
+        const professor = await userService.getProfessor(
+            updatedProject.professor_id
+        );
+        updatedProject.professor = professor;
+
+        const updatedProjects = projects.map((p) =>
+            p.id === updatedProject.id ? updatedProject : p
+        );
+
+        setProjects(updatedProjects);
+    };
+
     const dataWithViewDetails = projects.map((project) => ({
         ...project,
         onViewDetails: () => handleViewDetails(project),
         onEdit: () => handleEditProject(project),
         onDelete: () => handleDeleteProject(project.id),
+        onMemberManagement: () => handleMemberManagement(project),
     }));
 
     return (
@@ -193,6 +218,13 @@ const StudentProjects = () => {
                 open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}
                 onConfirm={() => handleConfirmDelete(selectedProject.id)}
+            />
+            <GroupManagement
+                project={selectedProject}
+                updateProject={handleUpdateProject}
+                open={groupManagementOpen}
+                onOpenChange={setGroupManagementOpen}
+                memberLimit={5}
             />
             <Toaster />
         </div>

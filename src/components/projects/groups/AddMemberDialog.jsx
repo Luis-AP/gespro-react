@@ -140,7 +140,7 @@ const AddMemberDialog = ({
             disabled={!selectedPerson}
             onClick={() => onAdd(selectedPerson)}
           >
-            {selectedPerson ? `Añadir ${selectedPerson.first_name}` : 'Añadir'}
+            {selectedPerson ? `Añadir a ${selectedPerson.first_name}` : 'Añadir'}
           </Button>
         </DialogFooter>
       </DialogContent>
