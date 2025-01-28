@@ -15,7 +15,13 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
-const GroupManagement = ({ project, updateProject, open, onOpenChange }) => {
+const GroupManagement = ({
+    project,
+    updateProject,
+    open,
+    onOpenChange,
+    memberLimit,
+}) => {
     const { toast } = useToast();
     const [members, setMembers] = useState([]);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -23,12 +29,17 @@ const GroupManagement = ({ project, updateProject, open, onOpenChange }) => {
     const [memberToDelete, setMemberToDelete] = useState(null);
     const [selectedPerson, setSelectedPerson] = useState(null);
     const [loading, setLoading] = useState(false); // Cambiar a true y ajustar el estado loading
+    const [memberLimitReached, setMemberLimitReached] = useState(false);
 
     useEffect(() => {
         if (open) {
             loadProjectData();
         }
     }, [open]);
+
+    useEffect(() => {
+        setMemberLimitReached(members.length >= memberLimit);
+    }, [members, memberLimit]);
 
     const loadStudentsInfo = async (memberIds) => {
         try {
@@ -104,10 +115,26 @@ const GroupManagement = ({ project, updateProject, open, onOpenChange }) => {
 
     const handleAddMember = async (person) => {
         if (person) {
+            if (members.length >= memberLimit) {
+                toast({
+                    title: "Error",
+                    description:
+                        "No se pueden añadir más de {memberLimit} integrantes",
+                    variant: "destructive",
+                });
+                return;
+            }
+
             try {
                 await projectsService.addMember(project.id, person.id);
                 setMembers([...members, { ...person, role: "Integrante" }]);
                 updateProject(project);
+
+                // Verificar si se llegó al límite de integrantes
+                if (members.length + 1 >= memberLimit) {
+                    setMemberLimitReached(true);
+                }
+
                 toast({
                     title: "Éxito",
                     description: "Miembro añadido correctamente",
@@ -138,7 +165,7 @@ const GroupManagement = ({ project, updateProject, open, onOpenChange }) => {
                             <Button
                                 variant="default"
                                 onClick={() => setIsAddDialogOpen(true)}
-                                disabled={loading}
+                                disabled={loading || memberLimitReached}
                             >
                                 Añadir integrante
                             </Button>

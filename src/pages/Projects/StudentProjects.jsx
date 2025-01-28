@@ -224,6 +224,7 @@ const StudentProjects = () => {
                 updateProject={handleUpdateProject}
                 open={groupManagementOpen}
                 onOpenChange={setGroupManagementOpen}
+                memberLimit={5}
             />
             <Toaster />
         </div>
