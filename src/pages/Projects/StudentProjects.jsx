@@ -10,8 +10,11 @@ import { DeleteDialog as ProjectDeleteDialog } from "@/components/DeleteDialog";
 import { Button } from "@/components/ui/button";
 
 import projectsService from "../../services/projectsService";
+import userService from "../../services/userService";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const StudentProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -31,6 +34,8 @@ const StudentProjects = () => {
     const { state } = useAuth();
     const user = state.user;
 
+    const { toast } = useToast();
+
     useEffect(() => {
         fetchProjects();
     }, [user]);
@@ -44,9 +49,21 @@ const StudentProjects = () => {
         try {
             setIsLoading(true);
             const response = await projectsService.getProjects();
-            setProjects(response);
+
+            const projectsWithProfessors = await Promise.all(
+                response.map(async (project) => {
+                    const professor = await userService.getProfessor(
+                        project.professor_id
+                    ); // Servicio para obtener al profesor
+                    return { ...project, professor };
+                })
+            );
+
+            setProjects(projectsWithProfessors);
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -57,12 +74,23 @@ const StudentProjects = () => {
 
     const handleSubmitNewProject = async (project) => {
         try {
-            // Llamar al servicio para crear un nuevo proyecto
-            //...
-            // Cerrar el formulario
+            setIsLoading(true);
+            await projectsService.createProject(project);
             setFormOpen(false);
+            fetchProjects();
+
+            toast({
+                title: "Proyecto creado",
+                description: "El proyecto se ha creado correctamente",
+            });
         } catch (error) {
-            console.error(error);
+            toast({
+                title: "Error",
+                description: error.message || "No se pudo crear el proyecto",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -94,8 +122,16 @@ const StudentProjects = () => {
             setIsLoading(true);
             await projectsService.deleteProject(projectId);
             fetchProjects();
+            toast({
+                title: "Proyecto eliminado",
+                description: "El proyecto se ha eliminado correctamente",
+            });
         } catch (error) {
-            console.error(error);
+            toast({
+                title: "Error",
+                description: error.message || "No se pudo eliminar el proyecto",
+                variant: "destructive",
+            });
         }
     };
 
@@ -134,7 +170,6 @@ const StudentProjects = () => {
                 onSubmit={(project) => handleSubmitNewProject(project)}
             />
             <ProjectEditForm
-                project={selectedProject}
                 open={editFormOpen}
                 onOpenChange={setEditFormOpen}
                 isLoading={isLoading}
@@ -148,6 +183,7 @@ const StudentProjects = () => {
                 onClose={() => setDeleteDialogOpen(false)}
                 onConfirm={() => handleConfirmDelete(selectedProject.id)}
             />
+            <Toaster />
         </div>
     );
 };

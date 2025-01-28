@@ -19,7 +19,7 @@ export function ActivityDetails({ activity, open, onOpenChange }) {
     })
   }
 
-  const isOpen = new Date(activity.dueDate) > new Date()
+  const isOpen = new Date(activity.due_date) > new Date()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -34,14 +34,14 @@ export function ActivityDetails({ activity, open, onOpenChange }) {
             <Calendar className="h-5 w-5 text-blue-500" />
             <div>
               <p className="text-sm font-medium mb-1">Fecha de entrega</p>
-              <p className="text-sm text-gray-500">{formatDate(activity.dueDate)}</p>
+              <p className="text-sm text-gray-500">{formatDate(activity.due_date)}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <GraduationCap className="h-5 w-5 text-green-500" />
             <div>
               <p className="text-sm font-medium mb-1">Nota mínima requerida</p>
-              <p className="text-sm text-gray-500">{activity.minGrade}</p>
+              <p className="text-sm text-gray-500">{activity.min_grade}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">

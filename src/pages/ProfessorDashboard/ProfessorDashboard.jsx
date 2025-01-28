@@ -46,10 +46,7 @@ const ProfessorDashboard = () => {
 
     const handleViewDetails = async (activity) => {
         try {
-            const response = await activitiesService.getActivityById(
-                activity.id
-            );
-            setSelectedActivity(response.activity);
+            setSelectedActivity(activity);
             setDetailsOpen(true);
         } catch (error) {
             toast({
@@ -73,7 +70,7 @@ const ProfessorDashboard = () => {
                 professorId: user.id,
             };
 
-            const response = await activitiesService.createActivity(
+            await activitiesService.createActivity(
                 newActivityData
             );
 
