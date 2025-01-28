@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
-import { studentColumns as columns } from "@/components/projects/columns";
-import { DataTable } from "@/components/projects/data-table";
+import { ProjectStudentColumns as columns } from "@/components/projects/ProjectStudentColumns";
+import { DataTable } from "@/components/projects/DataTable";
 
 import { ProjectDetails } from "@/components/projects/ProjectDetails";
 import ProjectForm from "@/components/projects/ProjectForm";
@@ -10,8 +10,13 @@ import { DeleteDialog as ProjectDeleteDialog } from "@/components/DeleteDialog";
 import { Button } from "@/components/ui/button";
 
 import projectsService from "../../services/projectsService";
+import userService from "../../services/userService";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
+
+import GroupManagement from "@/components/projects/groups/GroupManagement";
 
 const StudentProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -27,9 +32,13 @@ const StudentProjects = () => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     // Modal para confirmar la eliminación de un proyecto
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    // Modal para la gestión de grupos
+    const [groupManagementOpen, setGroupManagementOpen] = useState(false);
 
     const { state } = useAuth();
     const user = state.user;
+
+    const { toast } = useToast();
 
     useEffect(() => {
         fetchProjects();
@@ -44,9 +53,21 @@ const StudentProjects = () => {
         try {
             setIsLoading(true);
             const response = await projectsService.getProjects();
-            setProjects(response);
+
+            const projectsWithProfessors = await Promise.all(
+                response.map(async (project) => {
+                    const professor = await userService.getProfessor(
+                        project.professor_id
+                    ); // Servicio para obtener al profesor
+                    return { ...project, professor };
+                })
+            );
+
+            setProjects(projectsWithProfessors);
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -57,12 +78,23 @@ const StudentProjects = () => {
 
     const handleSubmitNewProject = async (project) => {
         try {
-            // Llamar al servicio para crear un nuevo proyecto
-            //...
-            // Cerrar el formulario
+            setIsLoading(true);
+            await projectsService.createProject(project);
             setFormOpen(false);
+            fetchProjects();
+
+            toast({
+                title: "Proyecto creado",
+                description: "El proyecto se ha creado correctamente",
+            });
         } catch (error) {
-            console.error(error);
+            toast({
+                title: "Error",
+                description: error.message || "No se pudo crear el proyecto",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -73,12 +105,22 @@ const StudentProjects = () => {
 
     const handleSubmitEditProject = async (project) => {
         try {
-            // Llamar al servicio para editar un proyecto
-            //...
-            // Cerrar el formulario
+            setIsLoading(true);
+            await projectsService.updateProject(project);
+
+            toast({
+                title: "Proyecto actualizado",
+                description: "El proyecto se ha actualizado correctamente",
+            });
             setEditFormOpen(false);
+            fetchProjects();
         } catch (error) {
-            console.error(error);
+            toast({
+                title: "Error",
+                description:
+                    error.message || "No se pudo actualizar el proyecto",
+                variant: "destructive",
+            });
         }
     };
 
@@ -94,9 +136,37 @@ const StudentProjects = () => {
             setIsLoading(true);
             await projectsService.deleteProject(projectId);
             fetchProjects();
+            toast({
+                title: "Proyecto eliminado",
+                description: "El proyecto se ha eliminado correctamente",
+            });
         } catch (error) {
-            console.error(error);
+            toast({
+                title: "Error",
+                description: error.message || "No se pudo eliminar el proyecto",
+                variant: "destructive",
+            });
         }
+    };
+
+    const handleMemberManagement = (project) => {
+        setSelectedProject(project);
+        setGroupManagementOpen(true);
+    };
+
+    const handleUpdateProject = async (project) => {
+        let updatedProject = await projectsService.getProjectById(project.id);
+        //Update professor
+        const professor = await userService.getProfessor(
+            updatedProject.professor_id
+        );
+        updatedProject.professor = professor;
+
+        const updatedProjects = projects.map((p) =>
+            p.id === updatedProject.id ? updatedProject : p
+        );
+
+        setProjects(updatedProjects);
     };
 
     const dataWithViewDetails = projects.map((project) => ({
@@ -104,6 +174,7 @@ const StudentProjects = () => {
         onViewDetails: () => handleViewDetails(project),
         onEdit: () => handleEditProject(project),
         onDelete: () => handleDeleteProject(project.id),
+        onMemberManagement: () => handleMemberManagement(project),
     }));
 
     return (
@@ -148,6 +219,14 @@ const StudentProjects = () => {
                 onClose={() => setDeleteDialogOpen(false)}
                 onConfirm={() => handleConfirmDelete(selectedProject.id)}
             />
+            <GroupManagement
+                project={selectedProject}
+                updateProject={handleUpdateProject}
+                open={groupManagementOpen}
+                onOpenChange={setGroupManagementOpen}
+                memberLimit={5}
+            />
+            <Toaster />
         </div>
     );
 };

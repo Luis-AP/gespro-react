@@ -9,6 +9,7 @@ import activitiesService from "@/services/activitiesService";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/toaster";
+import { useNavigate } from "react-router-dom";
 
 const ProfessorDashboard = () => {
     const [selectedActivity, setSelectedActivity] = useState(null);
@@ -19,6 +20,7 @@ const ProfessorDashboard = () => {
     const { toast } = useToast();
     const { state } = useAuth();
     const user = state.user;
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchActivities();
@@ -29,10 +31,6 @@ const ProfessorDashboard = () => {
             setIsLoading(true);
             const activities = await activitiesService.getActivities();
             setActivities(activities);
-            toast({
-                title: "Éxito",
-                description: "Actividades cargadas correctamente",
-            });
         } catch (error) {
             toast({
                 title: "Error",
@@ -46,10 +44,7 @@ const ProfessorDashboard = () => {
 
     const handleViewDetails = async (activity) => {
         try {
-            const response = await activitiesService.getActivityById(
-                activity.id
-            );
-            setSelectedActivity(response.activity);
+            setSelectedActivity(activity);
             setDetailsOpen(true);
         } catch (error) {
             toast({
@@ -73,9 +68,7 @@ const ProfessorDashboard = () => {
                 professorId: user.id,
             };
 
-            const response = await activitiesService.createActivity(
-                newActivityData
-            );
+            await activitiesService.createActivity(newActivityData);
 
             toast({
                 title: "Éxito",
@@ -95,9 +88,16 @@ const ProfessorDashboard = () => {
         }
     };
 
+    const handleShowProjects = (activity) => {
+        setSelectedActivity(activity);
+        navigate("/projects/professor", { state: { activity } });
+    };
+
     const dataWithViewDetails = activities.map((activity) => ({
         ...activity,
         onViewDetails: () => handleViewDetails(activity),
+        // Redirigir a la vista de proyectos al hacer clic en una actividad
+        onProjects: () => handleShowProjects(activity),
     }));
 
     return (

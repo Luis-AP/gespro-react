@@ -1,27 +1,15 @@
-import { Edit, Trash2, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { StatusBadge, TypeBadge } from "../CustomBadges";
 import ActionButton from "../ActionButton";
 
-import projectsService from "../../services/projectsService";
-
-export const studentColumns = [
+export const ProjectProfessorColumns = [
     {
         accessorKey: "title",
         header: "Título",
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue("title")}</div>
         ),
-        size: "w-[35%]",
-    },
-    {
-        accessorKey: "professor",
-        header: "Profesor",
-        cell: ({ row }) => (
-            <div className="flex justify-start gap-2">
-                {row.getValue("professor")}
-            </div>
-        ),
-        size: "w-[20%]",
+        size: "w-[25%]",
     },
     {
         accessorKey: "is_group",
@@ -67,27 +55,9 @@ export const studentColumns = [
                             }
                         }}
                     />
-                    <ActionButton
-                        icon={Edit}
-                        label="Editar"
-                        onClick={() => {
-                            if (project.onEdit) {
-                                project.onEdit(project);
-                            }
-                        }}
-                    />
-                    <ActionButton
-                        icon={Trash2}
-                        label="Eliminar"
-                        onClick={() => {
-                            if (project.onDelete) {
-                                project.onDelete(project.id);
-                            }
-                        }}
-                    />
                 </div>
             );
         },
-        size: "w-[15%]",
+        size: "w-[20%]",
     },
 ];

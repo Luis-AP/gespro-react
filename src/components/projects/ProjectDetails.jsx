@@ -26,7 +26,12 @@ import userService from "../../services/userService";
 import projectsService from "../../services/projectsService";
 import { useAuth } from "@/hooks/useAuth";
 
-export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate }) {
+export function ProjectDetails({
+    project,
+    open,
+    onOpenChange,
+    onProjectUpdate,
+}) {
     const [professor, setProfessor] = useState(null);
     const [members, setMembers] = useState([]);
     const [isEditingGrade, setIsEditingGrade] = useState(false);
@@ -39,7 +44,6 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
     useEffect(() => {
         setCurrentProject(project);
         if (project) {
-            handleProfessor(project.professor_id);
             handleMembers(project.member_ids);
         }
     }, [project]);
@@ -69,7 +73,7 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     const handleMembers = async (memberIDs) => {
         try {
@@ -87,7 +91,7 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     const handleGradeSubmit = async () => {
         try {
@@ -95,20 +99,23 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
             if (isNaN(grade) || grade < 0 || grade > 10) {
                 toast({
                     title: "Error",
-                    description: "La calificación debe ser un número entre 0 y 10",
+                    description:
+                        "La calificación debe ser un número entre 0 y 10",
                     variant: "destructive",
                 });
                 return;
             }
 
             await projectsService.gradeProject(currentProject.id, grade);
-            
+
             // Obtener el proyecto actualizado
-            const updatedProject = await projectsService.getProjectById(currentProject.id);
-            
+            const updatedProject = await projectsService.getProjectById(
+                currentProject.id
+            );
+
             // Actualizar el estado local
             setCurrentProject(updatedProject);
-            
+
             // Notificar al componente padre
             if (onProjectUpdate) {
                 onProjectUpdate(updatedProject);
@@ -127,11 +134,14 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
                 variant: "destructive",
             });
         }
-    }
+    };
 
     const renderGradeSection = () => {
-        const canGrade = user?.role === 'professor' && currentProject?.status === 'READY' || currentProject?.status === 'GRADED';
-        
+        const canGrade =
+            (user?.role === "professor" &&
+                currentProject?.status === "READY") ||
+            currentProject?.status === "GRADED";
+
         if (!canGrade) {
             return (
                 <p className="text-sm text-gray-500">
@@ -152,10 +162,7 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
                         max="10"
                         step="0.1"
                     />
-                    <Button 
-                        size="sm"
-                        onClick={handleGradeSubmit}
-                    >
+                    <Button size="sm" onClick={handleGradeSubmit}>
                         Calificar
                     </Button>
                 </div>
@@ -260,9 +267,7 @@ export function ProjectDetails({ project, open, onOpenChange, onProjectUpdate })
                         <User className="h-5 w-5 text-crimson-500" />
                         <div>
                             <p className="text-sm font-medium mb-1">Profesor</p>
-                            <p className="text-sm text-gray-500">
-                                {professor}
-                            </p>
+                            <p className="text-sm text-gray-500">{professor}</p>
                         </div>
                     </div>
                     {members && (

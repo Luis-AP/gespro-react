@@ -42,9 +42,21 @@ export const professorColumns = [
     {
         accessorKey: "name",
         header: "Nombre",
-        cell: ({ row }) => (
-            <div className="font-medium">{row.getValue("name")}</div>
-        ),
+        cell: ({ row }) => {
+            const activity = row.original;
+            return (
+                <div
+                    className="font-medium cursor-pointer hover:underline"
+                    onClick={() => {
+                        if (activity.onProjects) {
+                            activity.onProjects(activity);
+                        }
+                    }}
+                >
+                    {row.getValue("name")}
+                </div>
+            );
+        },
         size: "w-[40%]",
     },
     {
@@ -117,10 +129,10 @@ export const studentColumns = [
         size: "w-[40%]",
     },
     {
-        accessorKey: "dueDate",
+        accessorKey: "due_date",
         header: "Fecha de entrega",
         cell: ({ row }) => {
-            const date = new Date(row.getValue("dueDate"));
+            const date = new Date(row.getValue("due_date"));
             return (
                 <div className="flex justify-start">
                     {date.toLocaleDateString("es-ES", {
@@ -134,10 +146,10 @@ export const studentColumns = [
         size: "w-[20%]",
     },
     {
-        accessorKey: "minGrade",
+        accessorKey: "min_grade",
         header: "Nota mínima",
         cell: ({ row }) => (
-            <div className="text-center">{row.getValue("minGrade")}</div>
+            <div className="text-center">{row.getValue("min_grade")}</div>
         ),
         size: "w-[10%]",
     },
@@ -146,7 +158,7 @@ export const studentColumns = [
         header: "Estado",
         cell: ({ row }) => (
             <div className="flex justify-start gap-2">
-                <StatusBadge dueDate={row.getValue("dueDate")} />
+                <StatusBadge dueDate={row.getValue("due_date")} />
             </div>
         ),
         size: "w-[15%]",
@@ -171,7 +183,9 @@ export const studentColumns = [
                         icon={Send}
                         label={"Enviar Proyecto"}
                         onClick={() => {
-                            alert("Enviar proyecto");
+                            if (activity.onAddProject) {
+                                activity.onAddProject(activity);
+                            }
                         }}
                     />
                 </div>

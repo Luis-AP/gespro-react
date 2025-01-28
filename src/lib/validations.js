@@ -93,3 +93,24 @@ export const activitySchema = {
         },
     },
 };
+
+export const projectSchema = {
+    title: {
+        required: "El título es requerido",
+        minLength: {
+            value: 3,
+            message: "El nombre debe tener al menos 3 caracteres",
+        },
+    },
+    repository_url: {
+        required: "El enlace de repositorio es requerido",
+        //Patrón para aceptar enlaces de GitHub y GitLab
+        pattern: {
+            value: /^(https:\/\/github.com\/|https:\/\/gitlab.com\/)([a-zA-Z0-9-]+\/[a-zA-Z0-9-]+)$/,
+            message: "El enlace debe ser de GitHub o GitLab",
+        },
+    },
+    activity: {
+        required: "La actividad es requerida",
+    },
+};
