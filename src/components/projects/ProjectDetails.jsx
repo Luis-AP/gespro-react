@@ -59,10 +59,12 @@ export function ProjectDetails({
     }, [open, currentProject]);
 
     const formatDate = (dateStr) => {
-        return new Date(dateStr).toLocaleDateString("es-ES", {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("es-AR", {
             year: "numeric",
             month: "long",
             day: "numeric",
+            timeZone: "America/Argentina/Buenos_Aires",
         });
     };
 

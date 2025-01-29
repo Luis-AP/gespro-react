@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Info, Send, BookCheck } from "lucide-react";
+import formatDate from "../../lib/format-date";
 
 const ActionButton = ({ icon: Icon, label, onClick }) => (
     <TooltipProvider>
@@ -63,14 +64,9 @@ export const professorColumns = [
         accessorKey: "due_date",
         header: "Fecha de entrega",
         cell: ({ row }) => {
-            const date = new Date(row.getValue("due_date"));
             return (
                 <div className="flex justify-start">
-                    {date.toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })}
+                    {formatDate(row.getValue("due_date"))}
                 </div>
             );
         },
@@ -175,14 +171,9 @@ export const studentColumns = [
         accessorKey: "due_date",
         header: "Fecha de entrega",
         cell: ({ row }) => {
-            const date = new Date(row.getValue("due_date"));
             return (
                 <div className="flex justify-start">
-                    {date.toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })}
+                    {formatDate(row.getValue("due_date"))}
                 </div>
             );
         },

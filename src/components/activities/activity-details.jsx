@@ -8,17 +8,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Calendar, GraduationCap, Clock, FileText } from "lucide-react";
 import RichTextViewer from "../RichTextViewer";
+import formatDate from "../../lib/format-date";
 
 export function ActivityDetails({ activity, open, onOpenChange }) {
     if (!activity) return null;
-
-    const formatDate = (dateStr) => {
-        return new Date(dateStr).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
 
     const isOpen = new Date(activity.due_date) > new Date();
 
