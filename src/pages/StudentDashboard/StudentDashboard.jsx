@@ -4,6 +4,7 @@ import { DataTable } from "@/components/activities/data-table";
 import { ActivityDetails } from "@/components/activities/activity-details";
 import activitiesService from "@/services/activitiesService";
 import projectsService from "@/services/projectsService";
+import userService from "../../services/userService";
 import { useAuth } from "@/hooks/useAuth";
 import ProjectForm from "@/components/projects/ProjectForm";
 import { useToast } from "@/hooks/use-toast";
@@ -31,8 +32,18 @@ const StudentDashboard = () => {
     const fetchActivities = async () => {
         try {
             setIsLoading(true);
-            const activities = await activitiesService.getActivities();
-            setActivities(activities);
+            const response = await activitiesService.getActivities();
+
+            const activitiesWithProfessors = await Promise.all(
+                response.map(async (activity) => {
+                    const professor = await userService.getProfessor(
+                        activity.professor_id
+                    ); // Servicio para obtener al profesor
+                    return { ...activity, professor };
+                })
+            );
+
+            setActivities(activitiesWithProfessors);
         } catch (error) {
             console.error(error);
         } finally {
@@ -59,7 +70,9 @@ const StudentDashboard = () => {
             // Toast notification de error
             toast({
                 title: "Error",
-                description: error.message || "Ha ocurrido un error al crear el proyecto",
+                description:
+                    error.message ||
+                    "Ha ocurrido un error al crear el proyecto",
                 variant: "destructive",
             });
         } finally {

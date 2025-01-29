@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/toaster";
 import { useNavigate } from "react-router-dom";
-import { DeleteDialog as ActivityDeleteDialog } from "@/components/DeleteDialog";
 
 const ProfessorDashboard = () => {
     const [selectedActivity, setSelectedActivity] = useState(null);
@@ -128,7 +127,7 @@ const ProfessorDashboard = () => {
 
     const handleDeleteActivity = async (activityId) => {
         setSelectedActivity(
-            activities.find((activity) => activity.id === activityId)
+            projects.find((activity) => activity.id === activityId)
         );
         setDeleteDialogOpen(true);
     };
@@ -186,23 +185,21 @@ const ProfessorDashboard = () => {
                 onOpenChange={setFormOpen}
                 isLoading={isLoading}
                 onSubmit={handleSubmitNewActivity}
-                errorMessage="No se pudo crear la actividad"
             />
-            <ActivityForm
-                activity={selectedActivity}
+            <ProjectEditForm
+                project={selectedProject}
                 open={editFormOpen}
                 onOpenChange={setEditFormOpen}
                 isLoading={isLoading}
-                onSubmit={(activity) => handleSubmitEditActivity(activity)}
-                errorMessage="No se pudo actualizar la actividad"
+                onSubmit={(project) => handleSubmitEditProject(project)}
             />
-            <ActivityDeleteDialog
+            <ProjectDeleteDialog
                 title="¿Estás completamente seguro?"
                 description="Esta acción no se puede deshacer. Esto eliminará
-                                    permanentemente la actividad."
+                                    permanentemente el proyecto."
                 open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}
-                onConfirm={() => handleConfirmDelete(selectedActivity.id)}
+                onConfirm={() => handleConfirmDelete(selectedProject.id)}
             />
             <Toaster />
         </div>

@@ -38,8 +38,10 @@ const ProjectEditForm = ({
             await onSubmit({ ...data });
         } catch (err) {
             setError(
-                err.message || "Ha ocurrido un error al crear el proyecto"
+                err.message || "Ha ocurrido un error al editar el proyecto"
             );
+        } finally {
+            reset(project);
         }
     };
 

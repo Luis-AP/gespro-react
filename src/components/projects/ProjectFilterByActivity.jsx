@@ -71,7 +71,7 @@ export default function ProjectFilterByActivity({
             ) : (
                 <Command className="rounded-lg border shadow-md">
                     <CommandInput
-                        placeholder="Buscar por nombre de la actividad"
+                        placeholder="Filtrar por actividad"
                         value={inputValue}
                         onValueChange={handleSearchChange}
                     />

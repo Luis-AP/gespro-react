@@ -10,6 +10,7 @@ import { DeleteDialog as ProjectDeleteDialog } from "@/components/DeleteDialog";
 import { Button } from "@/components/ui/button";
 
 import projectsService from "../../services/projectsService";
+import activitiesService from "../../services/activitiesService";
 import userService from "../../services/userService";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -63,7 +64,16 @@ const StudentProjects = () => {
                 })
             );
 
-            setProjects(projectsWithProfessors);
+            const projectsWithActivities = await Promise.all(
+                projectsWithProfessors.map(async (project) => {
+                    const activity = await activitiesService.getActivity(
+                        project.activity_id
+                    );
+                    return { ...project, activity: activity.name };
+                })
+            );
+
+            setProjects(projectsWithActivities);
         } catch (error) {
             console.error(error);
         } finally {
@@ -80,7 +90,6 @@ const StudentProjects = () => {
         try {
             setIsLoading(true);
             await projectsService.createProject(project);
-            setFormOpen(false);
             fetchProjects();
 
             toast({
@@ -94,6 +103,7 @@ const StudentProjects = () => {
                 variant: "destructive",
             });
         } finally {
+            setFormOpen(false);
             setIsLoading(false);
         }
     };
@@ -112,7 +122,6 @@ const StudentProjects = () => {
                 title: "Proyecto actualizado",
                 description: "El proyecto se ha actualizado correctamente",
             });
-            setEditFormOpen(false);
             fetchProjects();
         } catch (error) {
             toast({
@@ -121,6 +130,9 @@ const StudentProjects = () => {
                     error.message || "No se pudo actualizar el proyecto",
                 variant: "destructive",
             });
+        } finally {
+            setEditFormOpen(false);
+            setIsLoading(false);
         }
     };
 
@@ -146,6 +158,9 @@ const StudentProjects = () => {
                 description: error.message || "No se pudo eliminar el proyecto",
                 variant: "destructive",
             });
+        } finally {
+            setDeleteDialogOpen(false);
+            setIsLoading(false);
         }
     };
 

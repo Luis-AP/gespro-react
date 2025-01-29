@@ -9,7 +9,17 @@ export const ProjectStudentColumns = [
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue("title")}</div>
         ),
-        size: "w-[25%]",
+        size: "w-[20%]",
+    },
+    {
+        accessorKey: "activity",
+        header: "Actividad",
+        cell: ({ row }) => (
+            <div className="flex justify-start font-medium">
+                {row.getValue("activity")}
+            </div>
+        ),
+        size: "w-[20%]",
     },
     {
         accessorKey: "professor",
@@ -27,7 +37,7 @@ export const ProjectStudentColumns = [
                 </div>
             );
         },
-        size: "w-[25%]",
+        size: "w-[20%]",
     },
     {
         accessorKey: "is_group",
@@ -37,7 +47,7 @@ export const ProjectStudentColumns = [
                 <TypeBadge isGroup={row.getValue("is_group")} />
             </div>
         ),
-        size: "w-[10%]",
+        size: "w-[5%]",
     },
     {
         accessorKey: "status",
@@ -47,7 +57,7 @@ export const ProjectStudentColumns = [
                 <StatusBadge status={row.getValue("status")} />
             </div>
         ),
-        size: "w-[10%]",
+        size: "w-[5%]",
     },
     {
         accessorKey: "grade",

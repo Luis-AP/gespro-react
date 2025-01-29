@@ -44,6 +44,7 @@ export function ProjectDetails({
     useEffect(() => {
         setCurrentProject(project);
         if (project) {
+            handleProfessor();
             handleMembers(project.member_ids);
         }
     }, [project]);
@@ -58,18 +59,19 @@ export function ProjectDetails({
     }, [open, currentProject]);
 
     const formatDate = (dateStr) => {
-        return new Date(dateStr).toLocaleDateString("es-ES", {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("es-AR", {
             year: "numeric",
             month: "long",
             day: "numeric",
+            timeZone: "America/Argentina/Buenos_Aires",
         });
     };
 
-    const handleProfessor = async (professorId) => {
-        if (!professorId) return;
+    const handleProfessor = async () => {
+        if (!project?.professor) return;
         try {
-            const professor = await userService.getProfessor(professorId);
-            setProfessor(`${professor.last_name}, ${professor.first_name}`);
+            setProfessor(project.professor);
         } catch (error) {
             console.error(error);
         }
@@ -108,17 +110,12 @@ export function ProjectDetails({
 
             await projectsService.gradeProject(currentProject.id, grade);
 
-            // Obtener el proyecto actualizado
-            const updatedProject = await projectsService.getProjectById(
-                currentProject.id
-            );
-
             // Actualizar el estado local
-            setCurrentProject(updatedProject);
+            setCurrentProject({ ...currentProject, grade });
 
             // Notificar al componente padre
             if (onProjectUpdate) {
-                onProjectUpdate(updatedProject);
+                onProjectUpdate({ ...currentProject, grade });
             }
 
             toast({
@@ -138,9 +135,9 @@ export function ProjectDetails({
 
     const renderGradeSection = () => {
         const canGrade =
-            (user?.role === "professor" &&
-                currentProject?.status === "READY") ||
-            currentProject?.status === "GRADED";
+            user?.role === "professor" &&
+            (currentProject?.status === "READY" ||
+                currentProject?.status === "GRADED");
 
         if (!canGrade) {
             return (
@@ -219,6 +216,11 @@ export function ProjectDetails({
                                 navigator.clipboard.writeText(
                                     currentProject.repository_url
                                 );
+                                toast({
+                                    title: "Copiado",
+                                    description:
+                                        "URL del repositorio copiada al portapapeles",
+                                });
                             }}
                         >
                             <span className="sr-only">Copy</span>
@@ -263,13 +265,28 @@ export function ProjectDetails({
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <User className="h-5 w-5 text-crimson-500" />
-                        <div>
-                            <p className="text-sm font-medium mb-1">Profesor</p>
-                            <p className="text-sm text-gray-500">{professor}</p>
+                    {user?.role === "student" ? (
+                        <div className="flex items-center gap-4">
+                            <User className="h-5 w-5 text-crimson-500" />
+                            <div>
+                                <p className="text-sm font-medium mb-1">
+                                    Profesor
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-medium">
+                                            Nombre Completo:{" "}
+                                            {professor.first_name}{" "}
+                                            {professor.last_name}
+                                        </span>
+                                        <span className="text-sm text-gray-500">
+                                            Email: {professor.email}
+                                        </span>
+                                    </div>
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    ) : null}
                     {members && (
                         <div className="flex items-start gap-4">
                             <Users className="h-5 w-5 text-blue-500" />

@@ -1,0 +1,66 @@
+.ql-viewer {
+    @apply text-sm text-gray-500;
+}
+
+/* Estilos para encabezados */
+.ql-viewer h1 {
+    @apply text-2xl font-bold mb-4;
+}
+
+.ql-viewer h2 {
+    @apply text-xl font-bold mb-3;
+}
+
+.ql-viewer h3 {
+    @apply text-lg font-bold mb-2;
+}
+
+/* Estilos para listas */
+.ql-viewer ul {
+    @apply list-disc pl-5 mb-4;
+}
+
+.ql-viewer ol {
+    @apply list-decimal pl-5 mb-4;
+}
+
+.ql-viewer li {
+    @apply mb-1;
+}
+
+/* Estilos para bloques de cita */
+.ql-viewer blockquote {
+    @apply border-l-4 border-gray-300 pl-4 my-4 italic;
+}
+
+/* Estilos para enlaces */
+.ql-viewer a {
+    @apply text-blue-500 hover:underline;
+}
+
+/* Estilos para texto formateado */
+.ql-viewer strong {
+    @apply font-bold;
+}
+
+.ql-viewer em {
+    @apply italic;
+}
+
+.ql-viewer s {
+    @apply line-through;
+}
+
+.ql-viewer u {
+    @apply underline;
+}
+
+/* Espaciado entre párrafos */
+.ql-viewer p {
+    @apply mb-4;
+}
+
+/* Imágenes */
+.ql-viewer img {
+    @apply max-w-full h-auto my-4 rounded;
+}

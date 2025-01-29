@@ -101,7 +101,7 @@ const GroupManagement = ({
                 });
             } catch (error) {
                 const errorMessage =
-                    error.data?.mensaje || "No se pudo eliminar al miembro";
+                    error.data?.message || "No se pudo eliminar al miembro";
                 toast({
                     title: "Error",
                     description: errorMessage,
@@ -141,7 +141,7 @@ const GroupManagement = ({
                 });
             } catch (error) {
                 const errorMessage =
-                    error.data?.mensaje || "No se pudo añadir al miembro";
+                    error.data?.message || "No se pudo añadir al miembro";
                 toast({
                     title: "Error",
                     description: errorMessage,

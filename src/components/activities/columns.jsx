@@ -6,7 +6,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Info, Send } from "lucide-react";
+import { Edit, Trash2, Info, Send, BookCheck } from "lucide-react";
+import formatDate from "../../lib/format-date";
 
 const ActionButton = ({ icon: Icon, label, onClick }) => (
     <TooltipProvider>
@@ -29,8 +30,8 @@ const ActionButton = ({ icon: Icon, label, onClick }) => (
     </TooltipProvider>
 );
 
-const StatusBadge = ({ dueDate }) => {
-    const isOpen = new Date(dueDate) > new Date();
+const StatusBadge = ({ due_date }) => {
+    const isOpen = new Date(due_date) > new Date();
     return (
         <Badge variant={isOpen ? "default" : "secondary"}>
             {isOpen ? "Abierta" : "Cerrada"}
@@ -63,14 +64,9 @@ export const professorColumns = [
         accessorKey: "due_date",
         header: "Fecha de entrega",
         cell: ({ row }) => {
-            const date = new Date(row.getValue("due_date"));
             return (
                 <div className="flex justify-start">
-                    {date.toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })}
+                    {formatDate(row.getValue("due_date"))}
                 </div>
             );
         },
@@ -89,7 +85,7 @@ export const professorColumns = [
         header: "Estado",
         cell: ({ row }) => (
             <div className="flex justify-start gap-2">
-                <StatusBadge dueDate={row.getValue("due_date")} />
+                <StatusBadge due_date={row.getValue("due_date")} />
             </div>
         ),
         size: "w-[15%]",
@@ -101,14 +97,39 @@ export const professorColumns = [
             const activity = row.original;
             return (
                 <div className="flex justify-start gap-2">
-                    <ActionButton icon={Edit} label="Editar" />
-                    <ActionButton icon={Trash2} label="Eliminar" />
                     <ActionButton
                         icon={Info}
                         label="Detalles"
                         onClick={() => {
                             if (activity.onViewDetails) {
                                 activity.onViewDetails(activity);
+                            }
+                        }}
+                    />
+                    <ActionButton
+                        icon={Edit}
+                        label="Editar"
+                        onClick={() => {
+                            if (activity.onEdit) {
+                                activity.onEdit(activity);
+                            }
+                        }}
+                    />
+                    <ActionButton
+                        icon={Trash2}
+                        label="Eliminar"
+                        onClick={() => {
+                            if (activity.onDelete) {
+                                activity.onDelete(activity);
+                            }
+                        }}
+                    />
+                    <ActionButton
+                        icon={BookCheck}
+                        label="Ver Proyectos"
+                        onClick={() => {
+                            if (activity.onProjects) {
+                                activity.onProjects(activity);
                             }
                         }}
                     />
@@ -126,20 +147,33 @@ export const studentColumns = [
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue("name")}</div>
         ),
-        size: "w-[40%]",
+        size: "w-[25%]",
+    },
+    {
+        accessorKey: "professor",
+        header: "Profesor",
+        cell: ({ row }) => {
+            const professor = row.getValue("professor");
+            return (
+                <div className="flex flex-col gap-1">
+                    <span className="font-medium">
+                        {professor.first_name} {professor.last_name}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                        {professor.email}
+                    </span>
+                </div>
+            );
+        },
+        size: "w-[20%]",
     },
     {
         accessorKey: "due_date",
         header: "Fecha de entrega",
         cell: ({ row }) => {
-            const date = new Date(row.getValue("due_date"));
             return (
                 <div className="flex justify-start">
-                    {date.toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })}
+                    {formatDate(row.getValue("due_date"))}
                 </div>
             );
         },
@@ -158,7 +192,7 @@ export const studentColumns = [
         header: "Estado",
         cell: ({ row }) => (
             <div className="flex justify-start gap-2">
-                <StatusBadge dueDate={row.getValue("due_date")} />
+                <StatusBadge due_date={row.getValue("due_date")} />
             </div>
         ),
         size: "w-[15%]",
@@ -191,6 +225,6 @@ export const studentColumns = [
                 </div>
             );
         },
-        size: "w-[15%]",
+        size: "w-[10%]",
     },
 ];

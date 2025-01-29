@@ -78,14 +78,14 @@ export const activitySchema = {
             message: "La descripción debe tener al menos 10 caracteres",
         },
     },
-    dueDate: {
+    due_date: {
         required: "La fecha de vencimiento es requerida",
     },
-    minGrade: {
+    min_grade: {
         required: "La nota de aprobación es requerida",
         min: {
-            value: 6,
-            message: "La nota de aprobación debe ser mayor o igual a 6",
+            value: 1,
+            message: "La nota de aprobación debe ser mayor o igual a 1",
         },
         max: {
             value: 10,

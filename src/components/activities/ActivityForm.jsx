@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -7,28 +7,21 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CalendarIcon } from "lucide-react";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as DatePicker } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import RichTextEditor from "./RichTextEditor";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useForm } from "react-hook-form";
 import { activitySchema } from "@/lib/validations";
 import { Controller } from "react-hook-form";
 
+import CalendarInput from "@/components/CalendarInput";
+import RichTextEditor from "./RichTextEditor";
+
 const ActivityForm = ({
-    activity = {},
+    activity,
     open,
     onOpenChange,
     onSubmit,
     isLoading,
+    errorMessage,
 }) => {
     const [error, setError] = useState(null);
     const {
@@ -36,14 +29,21 @@ const ActivityForm = ({
         control,
         handleSubmit,
         formState: { errors },
+        reset,
     } = useForm();
+
+    useEffect(() => {
+        if (open) {
+            reset(activity);
+        }
+    }, [open]);
 
     const onSubmitForm = async (data) => {
         try {
             setError(null);
             await onSubmit(data);
         } catch (err) {
-            setError(err.message || "Ha ocurrido un error al guardar la actividad");
+            setError(err.message || errorMessage);
         }
     };
 
@@ -52,7 +52,9 @@ const ActivityForm = ({
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">
-                        {activity.name ? "Editar Actividad" : "Crear Actividad"}
+                        {activity?.name
+                            ? "Editar Actividad"
+                            : "Crear Actividad"}
                     </DialogTitle>
                 </DialogHeader>
                 <form
@@ -103,56 +105,19 @@ const ActivityForm = ({
                     {/* Fecha de vencimiento */}
                     <div className="space-y-2">
                         <Controller
-                            name="dueDate"
+                            name="due_date"
                             control={control}
-                            rules={activitySchema.dueDate}
+                            rules={activitySchema.due_date}
                             render={({ field }) => (
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-full justify-start text-left font-normal"
-                                            )}
-                                            aria-invalid={
-                                                errors.dueDate
-                                                    ? "true"
-                                                    : "false"
-                                            }
-                                        >
-                                            <CalendarIcon />
-                                            {field.value ? (
-                                                format(field.value, "PPP", {
-                                                    locale: es,
-                                                })
-                                            ) : (
-                                                <span>
-                                                    Elegí la fecha de
-                                                    vencimiento
-                                                </span>
-                                            )}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-                                        <div>
-                                            <DatePicker
-                                                locale={es}
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                disabled={(date) =>
-                                                    date <= new Date()
-                                                }
-                                                initialFocus
-                                            />
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
+                                <CalendarInput
+                                    field={field}
+                                    errors={errors.due_date}
+                                />
                             )}
                         />
-                        {errors.dueDate && (
+                        {errors.due_date && (
                             <p className="text-sm text-red-500">
-                                {errors.dueDate.message}
+                                {errors.due_date.message}
                             </p>
                         )}
                     </div>
@@ -162,12 +127,12 @@ const ActivityForm = ({
                         <Input
                             type="number"
                             placeholder="Nota de Aprobación"
-                            {...register("minGrade", activitySchema.minGrade)}
-                            aria-invalid={errors.minGrade ? "true" : "false"}
+                            {...register("min_grade", activitySchema.min_grade)}
+                            aria-invalid={errors.min_grade ? "true" : "false"}
                         />
-                        {errors.minGrade && (
+                        {errors.min_grade && (
                             <p className="text-sm text-red-500">
-                                {errors.minGrade.message}
+                                {errors.min_grade.message}
                             </p>
                         )}
                     </div>
@@ -180,7 +145,7 @@ const ActivityForm = ({
                     >
                         {isLoading
                             ? "Guardando..."
-                            : activity.name
+                            : activity?.name
                             ? "Guardar Cambios"
                             : "Crear Actividad"}
                     </Button>
