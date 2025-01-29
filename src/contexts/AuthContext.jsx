@@ -101,7 +101,7 @@ function AuthProvider() {
             expires: 7,
         });
 
-        const redirectPath = user.role === 'professor' ? '/activities' : '/projects';
+        const redirectPath = user.role === 'professor' ? '/activities/professor' : '/activities/student';
         const origin = location.state?.from?.pathname || redirectPath;
         navigate(origin);
     }, [location.state, navigate]);
