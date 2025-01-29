@@ -6,7 +6,9 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "../contexts/AuthContext";
 import Layout from "./Layout";
+import HomePage from "../pages/Home/HomePage";
 import Login from "../pages/Login/Login";
+import NotFoundPage from "../pages/NotFound/NotFoundPage";
 import ProfessorDashboard from "../pages/ProfessorDashboard/ProfessorDashboard";
 import {
     ProtectedRoute,
@@ -14,13 +16,13 @@ import {
     StudentRoute,
 } from "@/routes/ProtectedRoute";
 import StudentDashboard from "../pages/StudentDashboard/StudentDashboard";
-import GroupManagement from "../components/projects/groups/GroupManagement";
 import StudentProjects from "../pages/Projects/StudentProjects";
 import ProfessorProjects from "../pages/Projects/ProfessorProjects";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route element={<AuthProvider />}>
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Login />} />
 
             <Route
@@ -68,8 +70,9 @@ const router = createBrowserRouter(
                 </Route>
             </Route>
 
+            {/* Ruta para manejar páginas no encontradas */}
             <Route path="*" element={<Layout />}>
-                <Route path="*" element={<GroupManagement />} />
+                <Route path="*" element={<NotFoundPage />} />
             </Route>
         </Route>
     )

@@ -29,7 +29,7 @@ export function RoleRoute({ children, roles }) {
     const redirectPath =
         user?.role === "professor"
             ? "/activities/professor"
-            : "/projects/student";
+            : "/activities/student";
     return <Navigate to={redirectPath} replace />;
 }
 
