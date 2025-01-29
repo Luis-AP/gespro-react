@@ -9,7 +9,17 @@ export const ProjectProfessorColumns = [
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue("title")}</div>
         ),
-        size: "w-[25%]",
+        size: "w-[20%]",
+    },
+    {
+        accessorKey: "activity",
+        header: "Actividad",
+        cell: ({ row }) => (
+            <div className="flex justify-start font-medium">
+                {row.getValue("activity")}
+            </div>
+        ),
+        size: "w-[20%]",
     },
     {
         accessorKey: "is_group",
@@ -58,6 +68,6 @@ export const ProjectProfessorColumns = [
                 </div>
             );
         },
-        size: "w-[20%]",
+        size: "w-[5%]",
     },
 ];

@@ -6,6 +6,7 @@ import { DataTable } from "@/components/projects/DataTable";
 import { ProjectDetails } from "@/components/projects/ProjectDetails";
 
 import projectsService from "../../services/projectsService";
+import activitiesService from "../../services/activitiesService";
 import userService from "../../services/userService";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -71,7 +72,16 @@ const ProfessorProjects = () => {
                 })
             );
 
-            setProjects(projectsWithProfessors);
+            const projectsWithActivities = await Promise.all(
+                response.map(async (project) => {
+                    const activity = await activitiesService.getActivity(
+                        project.activity_id
+                    );
+                    return { ...project, activity: activity.name };
+                })
+            );
+
+            setProjects(projectsWithActivities);
         } catch (error) {
             console.error(error);
         } finally {
