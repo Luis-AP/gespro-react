@@ -63,15 +63,6 @@ const ProfessorProjects = () => {
                 activityId ? { activity_id: activityId } : {}
             );
 
-            const projectsWithProfessors = await Promise.all(
-                response.map(async (project) => {
-                    const professor = await userService.getProfessor(
-                        project.professor_id
-                    ); // Servicio para obtener al profesor
-                    return { ...project, professor };
-                })
-            );
-
             const projectsWithActivities = await Promise.all(
                 response.map(async (project) => {
                     const activity = await activitiesService.getActivity(

@@ -110,17 +110,12 @@ export function ProjectDetails({
 
             await projectsService.gradeProject(currentProject.id, grade);
 
-            // Obtener el proyecto actualizado
-            const updatedProject = await projectsService.getProjectById(
-                currentProject.id
-            );
-
             // Actualizar el estado local
-            setCurrentProject(updatedProject);
+            setCurrentProject({ ...currentProject, grade });
 
             // Notificar al componente padre
             if (onProjectUpdate) {
-                onProjectUpdate(updatedProject);
+                onProjectUpdate({ ...currentProject, grade });
             }
 
             toast({
@@ -140,9 +135,9 @@ export function ProjectDetails({
 
     const renderGradeSection = () => {
         const canGrade =
-            (user?.role === "professor" &&
-                currentProject?.status === "READY") ||
-            currentProject?.status === "GRADED";
+            user?.role === "professor" &&
+            (currentProject?.status === "READY" ||
+                currentProject?.status === "GRADED");
 
         if (!canGrade) {
             return (
@@ -221,6 +216,11 @@ export function ProjectDetails({
                                 navigator.clipboard.writeText(
                                     currentProject.repository_url
                                 );
+                                toast({
+                                    title: "Copiado",
+                                    description:
+                                        "URL del repositorio copiada al portapapeles",
+                                });
                             }}
                         >
                             <span className="sr-only">Copy</span>
